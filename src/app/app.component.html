@@ -1,11 +1,18 @@
 <header class="app-header">
-  <a class="brand" routerLink="/orders">Kitchen Orders Board</a>
-  <nav aria-label="Main">
-    <a routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Board</a>
-    <a class="cta" routerLink="/orders/new">New order</a>
-  </nav>
+  <div class="container bar">
+    <a class="brand" routerLink="/orders">
+      <span class="logo" aria-hidden="true">K</span>
+      Kitchen Orders
+    </a>
+    <nav aria-label="Main">
+      <a class="link" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        Board
+      </a>
+      <a class="btn btn--primary" routerLink="/orders/new">+ New order</a>
+    </nav>
+  </div>
 </header>
 
-<main>
+<main class="container">
   <router-outlet />
 </main>
