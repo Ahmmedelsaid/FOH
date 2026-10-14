@@ -134,7 +134,7 @@
                 [order]="order"
                 [menu]="store.menu()"
                 [now]="store.now()"
-                [query]="needle()"
+                [query]="filters().query"
                 [pending]="store.pendingIds().has(order.id)"
                 (advance)="store.advance($event)"
               />

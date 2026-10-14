@@ -6,7 +6,7 @@ import { MenuItem } from '../../../core/models/menu.model';
 import { Order } from '../../../core/models/order.model';
 import { calculatePrice, itemsSubtotal } from '../../../core/pricing/pricing';
 import { formatElapsed, isLate } from './elapsed';
-import { splitMatch } from './order-filters';
+import { parseQuery, splitMatch } from './order-filters';
 
 /** How many item lines a card shows before collapsing the rest into "+N more". */
 const PREVIEW_LINES = 3;
@@ -26,7 +26,7 @@ export class OrderCardComponent {
   readonly menu = input.required<ReadonlyMap<string, MenuItem>>();
   readonly now = input.required<number>();
   readonly pending = input(false);
-  /** Normalised search text; the matching part of the number and table is highlighted. */
+  /** The raw search text; the part of the number or table that matches it is highlighted. */
   readonly query = input('');
 
   readonly advance = output<Order>();
@@ -36,12 +36,22 @@ export class OrderCardComponent {
     return type === 'dine-in' && table !== null ? `T-${table}` : this.i18n.t(`type.${type}`);
   });
 
-  protected readonly numberParts = computed(() => splitMatch(String(this.order().number), this.query()));
+  private readonly term = computed(() => parseQuery(this.query()));
+
+  protected readonly numberParts = computed(() => {
+    const text = String(this.order().number);
+    const term = this.term();
+    return splitMatch(text, term?.kind === 'order' ? term.value : '');
+  });
 
   /** Only dine-in cards show a table number (T-7), so only those can highlight a table match. */
   protected readonly tableParts = computed(() => {
     const { type, table } = this.order();
-    return type === 'dine-in' && table !== null ? splitMatch(String(table), this.query()) : null;
+    if (type !== 'dine-in' || table === null) {
+      return null;
+    }
+    const term = this.term();
+    return splitMatch(String(table), term?.kind === 'table' ? term.value : '');
   });
 
   protected readonly placeLabel = computed(() => {
