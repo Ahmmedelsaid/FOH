@@ -1,0 +1,80 @@
+<div class="toolbar">
+  <label class="search">
+    <span class="sr-only">Search by order number or table</span>
+    <input type="search" [formControl]="search" placeholder="Search order # or table" autocomplete="off" />
+  </label>
+
+  <div class="types" role="group" aria-label="Filter by order type">
+    <button type="button" [attr.aria-pressed]="!filters().type" (click)="setType(null)">All</button>
+    @for (type of types; track type) {
+      <button type="button" [attr.aria-pressed]="filters().type === type" (click)="setType(type)">
+        {{ typeLabels[type] }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (store.actionError(); as message) {
+  <div class="banner error" role="alert">
+    <span>{{ message }}</span>
+    <button type="button" (click)="store.dismissError()">Dismiss</button>
+  </div>
+}
+
+@if (store.refreshFailed()) {
+  <div class="banner warning" role="status">
+    Couldn't refresh the board. Showing the last known orders, retrying automatically.
+  </div>
+}
+
+@switch (store.loadState()) {
+  @case ('loading') {
+    <div class="state" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      Loading orders…
+    </div>
+  }
+  @case ('error') {
+    <div class="state" role="alert">
+      <p>Couldn't load orders. Is the API running on port 3000?</p>
+      <button type="button" class="primary" (click)="store.retry()">Try again</button>
+    </div>
+  }
+  @default {
+    @if (store.orders().length === 0) {
+      <div class="state">
+        <p>No orders yet.</p>
+        <a class="primary" routerLink="/orders/new">Create the first order</a>
+      </div>
+    } @else if (visibleCount() === 0) {
+      <div class="state">
+        <p>No orders match your filters.</p>
+        @if (hasFilters()) {
+          <button type="button" class="primary" (click)="clearFilters()">Clear filters</button>
+        }
+      </div>
+    } @else {
+      <div class="columns">
+        @for (column of columns(); track column.status) {
+          <section class="column" [attr.data-status]="column.status" [attr.aria-label]="column.label">
+            <h2>
+              <span>{{ column.label }}</span>
+              <span class="count">{{ column.orders.length }}</span>
+            </h2>
+            @for (order of column.orders; track order.id) {
+              <app-order-card
+                [order]="order"
+                [menu]="store.menu()"
+                [now]="store.now()"
+                [pending]="store.pendingIds().has(order.id)"
+                (advance)="store.advance($event)"
+              />
+            } @empty {
+              <p class="empty">Nothing here</p>
+            }
+          </section>
+        }
+      </div>
+    }
+  }
+}

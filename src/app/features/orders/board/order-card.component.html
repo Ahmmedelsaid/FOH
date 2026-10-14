@@ -1,0 +1,22 @@
+<article class="card" [class.late]="late()">
+  <header>
+    <a class="number" [routerLink]="['/orders', order().id]">#{{ order().number }}</a>
+    <span class="place">{{ place() }}</span>
+  </header>
+  <p class="meta">
+    {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} · EGP {{ total() | number: '1.2-2' }}
+  </p>
+  <footer>
+    <span class="elapsed">{{ elapsedLabel() }}@if (late()) { · late }</span>
+    @if (actionLabel(); as label) {
+      <button
+        type="button"
+        [disabled]="pending()"
+        [attr.aria-label]="label + ', order ' + order().number"
+        (click)="advance.emit(order())"
+      >
+        {{ label }}
+      </button>
+    }
+  </footer>
+</article>

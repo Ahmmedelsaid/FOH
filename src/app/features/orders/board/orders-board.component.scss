@@ -1,0 +1,179 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.search {
+  flex: 1 1 220px;
+
+  input {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 0.75rem;
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: inherit;
+  }
+}
+
+.types {
+  display: flex;
+  gap: 0.25rem;
+
+  button {
+    font: inherit;
+    min-height: 40px;
+    padding: 0 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: inherit;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--surface);
+    }
+  }
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid;
+
+  &.error {
+    border-color: var(--late);
+    color: var(--late);
+    background: var(--late-bg);
+  }
+
+  &.warning {
+    border-color: var(--preparing);
+    background: var(--warning-bg);
+  }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    color: inherit;
+    min-height: 32px;
+    padding: 0 0.6rem;
+  }
+}
+
+.state {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  color: var(--muted);
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  min-height: 40px;
+  padding: 0 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.column {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  --column-color: var(--muted);
+
+  &[data-status='new'] {
+    --column-color: var(--new);
+  }
+  &[data-status='preparing'] {
+    --column-color: var(--preparing);
+  }
+  &[data-status='ready'] {
+    --column-color: var(--ready);
+  }
+
+  h2 {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 3px solid var(--column-color);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+// On phones the four columns scroll horizontally and snap, one column at a time.
+@media (max-width: 899px) {
+  .columns {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+  }
+
+  .column {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+}
