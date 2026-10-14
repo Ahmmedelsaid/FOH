@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "api": "node -e \"const fs=require('fs');if(!fs.existsSync('db.json'))fs.copyFileSync('db.seed.json','db.json')\" && json-server db.json --port 3000",
-    "api:reset": "node -e \"require('fs').copyFileSync('db.seed.json','db.json')\""
+    "api:reset": "node -e \"require('fs').copyFileSync('db.seed.json','db.json')\"",
+    "start:demo": "ng serve --configuration demo",
+    "build:demo": "ng build --configuration demo --base-href /FOH/ && node scripts/spa-fallback.js"
   },
   "private": true,
   "dependencies": {
