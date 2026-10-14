@@ -34,8 +34,11 @@
   </ul>
 
   <p class="meta">
-    {{ 'card.items' | t: { count: itemCount() } }} ·
-    <strong>{{ i18n.money(total()) }}</strong>
+    <span>
+      {{ 'card.items' | t: { count: itemCount() } }} ·
+      <strong>{{ i18n.money(total()) }}</strong>
+    </span>
+    <span class="view" aria-hidden="true">{{ 'card.view' | t }}</span>
   </p>
 
   <footer>
