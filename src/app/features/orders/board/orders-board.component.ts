@@ -8,7 +8,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
 import { isLate } from './elapsed';
-import { BoardFilters, filterOrders } from './order-filters';
+import { BoardFilters, filterOrders, parseQuery } from './order-filters';
 import { OrderCardComponent } from './order-card.component';
 import { OrdersBoardStore } from './orders-board.store';
 
@@ -60,6 +60,14 @@ export class OrdersBoardComponent {
         .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)),
     }));
   });
+
+  /** True while the search box holds a real query (not just a prefix like "#"). */
+  protected readonly hasSearch = computed(() => parseQuery(this.filters().query) !== null);
+
+  /** While searching, columns without a match are hidden so only the found orders are shown. */
+  protected readonly visibleColumns = computed(() =>
+    this.hasSearch() ? this.columns().filter((column) => column.orders.length > 0) : this.columns(),
+  );
 
   protected readonly lateCount = computed(() => {
     const now = this.store.now();

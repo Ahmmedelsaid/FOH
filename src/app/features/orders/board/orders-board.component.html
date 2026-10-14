@@ -117,11 +117,10 @@
         </button>
       </div>
     } @else {
-      <div class="columns">
-        @for (column of columns(); track column.status) {
+      <div class="columns" [class.is-search]="hasSearch()">
+        @for (column of visibleColumns(); track column.status) {
           <section
             class="column"
-            [class.dimmed]="isFiltered() && column.orders.length === 0"
             [attr.data-status]="column.status"
             [attr.aria-label]="'status.' + column.status | t"
           >
