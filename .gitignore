@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# json-server writes here; it is created from db.seed.json on first run
+/db.json

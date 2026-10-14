@@ -13,7 +13,7 @@ npm start        # app on http://localhost:4200  (in a second terminal)
 npm test         # unit tests (Karma + Jasmine, needs Chrome)
 ```
 
-json-server writes changes into `db.json`. `npm run api:reset` restores it from `db.seed.json`.
+`db.json` is created from `db.seed.json` the first time you run `npm run api`, and json-server writes your changes into it (it is git-ignored). `npm run api:reset` restores the seed data.
 The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts`).
 
 ## What is implemented
