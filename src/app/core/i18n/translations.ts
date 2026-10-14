@@ -82,6 +82,7 @@ export const EN = {
   'details.col.total': 'Total (EGP)',
   'price.subtotal': 'Subtotal',
   'price.service': 'Service (12%)',
+  'price.serviceNa': 'Service (dine-in only)',
   'price.vat': 'VAT (14%)',
   'price.total': 'Total',
 
@@ -216,6 +217,7 @@ export const AR: Record<TranslationKey, string> = {
   'details.col.total': 'الإجمالي (ج.م)',
   'price.subtotal': 'المجموع الفرعي',
   'price.service': 'الخدمة (12%)',
+  'price.serviceNa': 'الخدمة (للأكل داخل المطعم فقط)',
   'price.vat': 'ضريبة القيمة المضافة (14%)',
   'price.total': 'الإجمالي',
 

@@ -1,4 +1,4 @@
-<a class="back-link" routerLink="/orders">{{ 'common.back' | t }}</a>
+<app-back-link />
 
 @switch (state().kind) {
   @case ('loading') {
@@ -85,9 +85,9 @@
               <dt>{{ 'price.subtotal' | t }}</dt>
               <dd class="ltr">{{ i18n.number(s.price.subtotal) }}</dd>
             </div>
-            <div>
-              <dt>{{ 'price.service' | t }}</dt>
-              <dd class="ltr">{{ i18n.number(s.price.service) }}</dd>
+            <div [class.not-applicable]="s.order.type !== 'dine-in'">
+              <dt>{{ (s.order.type === 'dine-in' ? 'price.service' : 'price.serviceNa') | t }}</dt>
+              <dd class="ltr">{{ s.order.type === 'dine-in' ? i18n.number(s.price.service) : '—' }}</dd>
             </div>
             <div>
               <dt>{{ 'price.vat' | t }}</dt>
