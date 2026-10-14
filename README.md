@@ -45,6 +45,8 @@ Not done: deployed demo.
 - **Kitchen-first UI.** Cards preview the items and notes so staff do not need to open each order, the action button is coloured by the status the order moves to, and a header shows when the board last refreshed plus how many orders are late. The new-order form keeps a live summary (lines, service, VAT, total) next to the form on desktop.
 - **Arabic/English with RTL.** A small runtime i18n service (`core/i18n`): the language is a signal, templates use an impure `t` pipe, plurals go through `Intl.PluralRules` (Arabic has six forms) and the Arabic dictionary is a typed `Record`, so a missing key fails the build. The service sets `lang` and `dir` on `<html>`, and the CSS uses logical properties (`inline-start`, `padding-inline`), so one stylesheet serves both directions. Angular's built-in i18n needs one build per language, which does not fit a toggle button.
 - **Dark mode.** `ThemeService` mirrors a signal into `<html data-theme>`; all colours are CSS variables, so the dark theme only redefines tokens (and sets `color-scheme` so native inputs follow). First visit follows the OS preference. Kitchen displays are often dark, which is why it is there.
+- **Order-taking speed.** The new-order form has a quick-add menu (tap an item to add it, tap again for one more) next to the normal rows, so the select is only needed for edits. Quantity has − / + buttons. Both feed the same `FormArray`, so validation and totals are unchanged.
+- **Search feedback.** The board shows "Showing X of Y orders" with a clear link, highlights the matching digits on the cards, shrinks empty columns while filtering, and Escape or the × button clears the search.
 - No UI library: plain SCSS with a few CSS variables kept the bundle small and the code easy to explain.
 
 ## Assumptions
@@ -54,7 +56,7 @@ Not done: deployed demo.
 - Search matches order number or table number by substring; a leading `#` is ignored.
 - Seed orders are old, so New/Preparing ones show as late (expected per the task).
 - The "late" marker is shown with text as well as colour. Served orders show "done" instead of a timer.
-- The same menu item can appear in more than one row of a new order.
+- Quick add merges taps on the same item into one row (quantity goes up). Rows added by hand with "Add item" can still repeat an item.
 - New order number = highest existing number + 1, and `id` is the number as a string. With a real backend the server would assign both; two clients creating orders at the same moment could collide here.
 - The menu is fetched once and cached (`shareReplay`); a failed request is not cached.
 - Mobile layout: columns scroll horizontally with snap, one column at a time.

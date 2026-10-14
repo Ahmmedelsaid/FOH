@@ -18,6 +18,9 @@ type ItemGroup = FormGroup<{
   note: FormControl<string>;
 }>;
 
+const MIN_QTY = 1;
+const MAX_QTY = 20;
+
 type MenuState =
   | { kind: 'loading' }
   | { kind: 'error' }
@@ -103,6 +106,17 @@ export class OrderFormComponent {
     });
   });
 
+  /** Total quantity per menu id, so the quick-add buttons can show what is already in the order. */
+  protected readonly quantities = computed(() => {
+    const totals = new Map<string, number>();
+    for (const { menuId, qty } of this.formValue().items) {
+      if (menuId) {
+        totals.set(menuId, (totals.get(menuId) ?? 0) + (qty || 0));
+      }
+    }
+    return totals;
+  });
+
   constructor() {
     const { type } = this.form.controls;
     type.valueChanges
@@ -116,6 +130,31 @@ export class OrderFormComponent {
 
   protected addItem(): void {
     this.items.push(this.createItem());
+    this.focusControl(`menu-${this.items.length - 1}`);
+  }
+
+  /**
+   * One tap adds a menu item: it bumps the quantity if the item is already in the order,
+   * otherwise fills an empty row, otherwise adds a new row.
+   */
+  protected quickAdd(item: MenuItem): void {
+    const existing = this.items.controls.find((row) => row.controls.menuId.value === item.id);
+    if (existing) {
+      this.changeQty(existing, 1);
+      return;
+    }
+    const blank = this.items.controls.find((row) => !row.controls.menuId.value);
+    if (blank) {
+      blank.controls.menuId.setValue(item.id);
+    } else {
+      this.items.push(this.createItem(item.id));
+    }
+  }
+
+  protected changeQty(row: ItemGroup, delta: number): void {
+    const next = (row.controls.qty.value || 0) + delta;
+    row.controls.qty.setValue(Math.min(MAX_QTY, Math.max(MIN_QTY, next)));
+    row.controls.qty.markAsDirty();
   }
 
   protected removeItem(index: number): void {
@@ -189,13 +228,18 @@ export class OrderFormComponent {
     target?.focus();
   }
 
-  private createItem(): ItemGroup {
+  /** Moves focus after the next render, so a newly added row can be typed into straight away. */
+  private focusControl(id: string): void {
+    setTimeout(() => this.host.nativeElement.querySelector<HTMLElement>(`#${id}`)?.focus());
+  }
+
+  private createItem(menuId = ''): ItemGroup {
     return this.fb.group({
-      menuId: this.fb.control('', Validators.required),
+      menuId: this.fb.control(menuId, Validators.required),
       qty: this.fb.control(1, [
         Validators.required,
-        Validators.min(1),
-        Validators.max(20),
+        Validators.min(MIN_QTY),
+        Validators.max(MAX_QTY),
         Validators.pattern(/^\d+$/),
       ]),
       note: this.fb.control(''),
