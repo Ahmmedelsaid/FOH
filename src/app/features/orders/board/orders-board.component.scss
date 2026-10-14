@@ -34,13 +34,18 @@
 }
 
 .late-chip {
-  padding: 0.2rem 0.65rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 999px;
-  background: var(--late-bg);
-  border: 1px solid var(--late-border);
-  color: var(--late);
-  font-size: 0.875rem;
-  font-weight: 600;
+  background: var(--late-solid);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.page-head .page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .toolbar {
@@ -96,8 +101,10 @@
   gap: 0.65rem;
   align-content: start;
   min-height: 160px;
-  padding: 0.75rem;
-  background: var(--lane);
+  padding: 0.9rem 0.8rem;
+  // A coloured top bar and a faint tint of the status colour tell the lanes apart at a distance.
+  background: color-mix(in srgb, var(--column-color) 7%, var(--lane));
+  border-top: 5px solid var(--column-color);
   border-radius: 12px;
 
   &[data-status='new'] {
@@ -115,19 +122,10 @@
     justify-content: space-between;
     align-items: center;
     padding-inline: 0.15rem;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-
-    &::before {
-      content: '';
-      width: 9px;
-      height: 9px;
-      margin-inline-end: 0.5rem;
-      border-radius: 50%;
-      background: var(--column-color);
-    }
 
     span:first-child {
       flex: 1;
@@ -135,13 +133,15 @@
   }
 
   .count {
-    min-width: 1.6rem;
-    padding: 0.05rem 0.45rem;
+    min-width: 2.2rem;
+    padding: 0.1rem 0.6rem;
     border-radius: 999px;
-    background: var(--surface);
+    background: var(--column-color);
+    color: var(--on-column);
     text-align: center;
     font-family: var(--mono);
-    font-size: 0.8125rem;
+    font-size: 1.0625rem;
+    font-weight: 800;
   }
 }
 
