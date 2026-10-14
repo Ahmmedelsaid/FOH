@@ -1,6 +1,6 @@
 import { Order } from '../../../core/models/order.model';
 import { LATE_AFTER_MS, formatElapsed, isLate } from './elapsed';
-import { filterOrders } from './order-filters';
+import { filterOrders, splitMatch } from './order-filters';
 
 const order = (overrides: Partial<Order>): Order => ({
   id: '1',
@@ -51,5 +51,28 @@ describe('elapsed', () => {
     expect(isLate({ status: 'new' }, LATE_AFTER_MS)).toBeFalse();
     expect(isLate({ status: 'ready' }, LATE_AFTER_MS * 5)).toBeFalse();
     expect(isLate({ status: 'served' }, LATE_AFTER_MS * 5)).toBeFalse();
+  });
+});
+
+describe('splitMatch', () => {
+  it('splits around the first match', () => {
+    expect(splitMatch('1043', '04')).toEqual([
+      { text: '1', match: false },
+      { text: '04', match: true },
+      { text: '3', match: false },
+    ]);
+  });
+
+  it('drops empty parts at the edges', () => {
+    expect(splitMatch('1043', '1043')).toEqual([{ text: '1043', match: true }]);
+    expect(splitMatch('1043', '10')).toEqual([
+      { text: '10', match: true },
+      { text: '43', match: false },
+    ]);
+  });
+
+  it('returns the text untouched when there is no query or no match', () => {
+    expect(splitMatch('1043', '')).toEqual([{ text: '1043', match: false }]);
+    expect(splitMatch('1043', '99')).toEqual([{ text: '1043', match: false }]);
   });
 });
