@@ -4,6 +4,7 @@ export const EN = {
   'nav.board': 'Board',
   'nav.newOrder': '+ New order',
   'nav.switchLanguage': 'Switch language',
+  'nav.theme': 'Dark mode',
   'nav.languageName': 'العربية',
 
   // Shared
@@ -134,6 +135,7 @@ export const AR: Record<TranslationKey, string> = {
   'nav.board': 'اللوحة',
   'nav.newOrder': '+ طلب جديد',
   'nav.switchLanguage': 'تغيير اللغة',
+  'nav.theme': 'الوضع الداكن',
   'nav.languageName': 'English',
 
   'common.back': '→ العودة إلى اللوحة',

@@ -21,7 +21,7 @@
   }
 
   &.late {
-    border-color: #fecaca;
+    border-color: var(--late-border);
     border-inline-start-color: var(--late);
   }
 
@@ -127,7 +127,7 @@ footer {
 .late-badge {
   padding: 0.05rem 0.45rem;
   border-radius: 999px;
-  background: var(--late);
+  background: var(--late-solid);
   color: #fff;
   font-family: system-ui, sans-serif;
   font-size: 0.6875rem;
@@ -147,7 +147,7 @@ footer {
     --next-color: var(--ready);
   }
   [data-status='ready'] & {
-    --next-color: var(--text);
+    --next-color: var(--served-action);
   }
 
   &:hover:not(:disabled) {

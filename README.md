@@ -27,7 +27,7 @@ The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts
 | New order `/orders/new` (lazy), FormArray, custom validators, running total, double-submit guard | `features/orders/new` |
 | Auto-refresh every 15s, no overlap, no flicker, stops on leave | `orders-board.store.ts` |
 | Loading / empty / error states, usable at 375px | every page |
-| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden, Arabic/English toggle with RTL | `core/i18n`, `orders-board.store.ts` |
+| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden, Arabic/English toggle with RTL, dark mode | `core/i18n`, `orders-board.store.ts` |
 
 Not done: deployed demo.
 
@@ -44,6 +44,7 @@ Not done: deployed demo.
 - **Money** is rounded to 2 decimals at each step (service, then VAT), which reproduces the reference numbers (574.56 and 273.60).
 - **Kitchen-first UI.** Cards preview the items and notes so staff do not need to open each order, the action button is coloured by the status the order moves to, and a header shows when the board last refreshed plus how many orders are late. The new-order form keeps a live summary (lines, service, VAT, total) next to the form on desktop.
 - **Arabic/English with RTL.** A small runtime i18n service (`core/i18n`): the language is a signal, templates use an impure `t` pipe, plurals go through `Intl.PluralRules` (Arabic has six forms) and the Arabic dictionary is a typed `Record`, so a missing key fails the build. The service sets `lang` and `dir` on `<html>`, and the CSS uses logical properties (`inline-start`, `padding-inline`), so one stylesheet serves both directions. Angular's built-in i18n needs one build per language, which does not fit a toggle button.
+- **Dark mode.** `ThemeService` mirrors a signal into `<html data-theme>`; all colours are CSS variables, so the dark theme only redefines tokens (and sets `color-scheme` so native inputs follow). First visit follows the OS preference. Kitchen displays are often dark, which is why it is there.
 - No UI library: plain SCSS with a few CSS variables kept the bundle small and the code easy to explain.
 
 ## Assumptions

@@ -37,7 +37,7 @@
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
   background: var(--late-bg);
-  border: 1px solid #fecaca;
+  border: 1px solid var(--late-border);
   color: var(--late);
   font-size: 0.875rem;
   font-weight: 600;
@@ -97,7 +97,7 @@
   align-content: start;
   min-height: 160px;
   padding: 0.75rem;
-  background: #eceef2;
+  background: var(--lane);
   border-radius: 12px;
 
   &[data-status='new'] {

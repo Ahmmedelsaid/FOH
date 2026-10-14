@@ -21,6 +21,17 @@
   --success: #15803d;
   --success-bg: #f0fdf4;
 
+  color-scheme: light;
+  --lane: #eceef2;
+  --segmented-bg: #e5e7eb;
+  --late-solid: #dc2626;
+  --late-border: #fecaca;
+  --late-text: #991b1b;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  --success-border: #bbf7d0;
+  --served-action: #111827;
+
   --radius: 10px;
   --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -138,7 +149,7 @@ h2 {
   display: inline-flex;
   padding: 3px;
   gap: 2px;
-  background: #e5e7eb;
+  background: var(--segmented-bg);
   border-radius: 10px;
 
   &__item {
@@ -227,19 +238,19 @@ h2 {
   font-size: 0.9375rem;
 
   &--error {
-    border-color: #fecaca;
+    border-color: var(--late-border);
     background: var(--late-bg);
-    color: #991b1b;
+    color: var(--late-text);
   }
 
   &--warning {
-    border-color: #fde68a;
+    border-color: var(--warning-border);
     background: var(--warning-bg);
-    color: #92400e;
+    color: var(--warning-text);
   }
 
   &--success {
-    border-color: #bbf7d0;
+    border-color: var(--success-border);
     background: var(--success-bg);
     color: var(--success);
   }
@@ -269,4 +280,38 @@ strong,
 
 .btn {
   white-space: nowrap;
+}
+
+// Dark theme ("kitchen display"): only the tokens change, components keep using the same variables.
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #1a1e25;
+  --surface-muted: #20252d;
+  --text: #e8eaed;
+  --muted: #9aa3af;
+  --border: #2a2f38;
+  --border-strong: #3a404b;
+
+  --accent: #3b82f6;
+  --accent-strong: #2563eb;
+  --new: #60a5fa;
+  --served: #9ca3af;
+
+  --lane: #14171c;
+  --segmented-bg: #262b34;
+  --served-action: #4b5563;
+
+  --late-bg: #2a1517;
+  --late-border: #7f1d1d;
+  --late-text: #fca5a5;
+  --late: #f87171;
+  --warning-bg: #2b2210;
+  --warning-border: #78561a;
+  --warning-text: #fcd34d;
+  --success: #86efac;
+  --success-bg: #10261a;
+  --success-border: #14532d;
+
+  --shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
