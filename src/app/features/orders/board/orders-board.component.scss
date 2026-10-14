@@ -239,13 +239,9 @@
   cursor: pointer;
 }
 
-// While filtering, columns without matches shrink instead of showing big empty boxes.
-.column.dimmed {
-  min-height: 0;
-  opacity: 0.7;
-
-  .empty {
-    padding: 0.25rem 0;
-    border: 0;
+// While searching only columns with results are rendered; keep them as wide as in the 4-column layout.
+@media (min-width: 900px) {
+  .columns.is-search {
+    grid-template-columns: repeat(auto-fill, minmax(0, calc((100% - 3rem) / 4)));
   }
 }

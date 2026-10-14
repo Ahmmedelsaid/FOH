@@ -46,7 +46,7 @@ Not done: deployed demo.
 - **Arabic/English with RTL.** A small runtime i18n service (`core/i18n`): the language is a signal, templates use an impure `t` pipe, plurals go through `Intl.PluralRules` (Arabic has six forms) and the Arabic dictionary is a typed `Record`, so a missing key fails the build. The service sets `lang` and `dir` on `<html>`, and the CSS uses logical properties (`inline-start`, `padding-inline`), so one stylesheet serves both directions. Angular's built-in i18n needs one build per language, which does not fit a toggle button.
 - **Dark mode.** `ThemeService` mirrors a signal into `<html data-theme>`; all colours are CSS variables, so the dark theme only redefines tokens (and sets `color-scheme` so native inputs follow). First visit follows the OS preference. Kitchen displays are often dark, which is why it is there.
 - **Order-taking speed.** The new-order form has a quick-add menu (tap an item to add it, tap again for one more) next to the normal rows, so the select is only needed for edits. Quantity has − / + buttons. Both feed the same `FormArray`, so validation and totals are unchanged.
-- **Search feedback.** The board shows "Showing X of Y orders" with a clear link, highlights the matching digits on the cards, shrinks empty columns while filtering, and Escape or the × button clears the search.
+- **Search feedback.** The board shows "Showing X of Y orders" with a clear link, highlights the matching digits on the cards, hides the columns without a match while searching (so only the found orders show), and Escape or the × button clears the search.
 - No UI library: plain SCSS with a few CSS variables kept the bundle small and the code easy to explain.
 
 ## Assumptions
