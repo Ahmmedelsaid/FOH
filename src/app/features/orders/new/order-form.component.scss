@@ -87,12 +87,12 @@
 // Each item is a small card: [item | qty | remove] on the first line, note below.
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 90px auto;
+  grid-template-columns: minmax(0, 1fr) 140px auto;
   grid-template-areas:
     'item qty remove'
     'note note note';
   gap: 0.75rem;
-  align-items: end;
+  align-items: start;
   padding: 0.9rem;
   background: var(--surface-muted);
   border: 1px solid var(--border);
@@ -111,6 +111,8 @@
     grid-area: remove;
     min-height: 42px;
     min-width: 42px;
+    // Lines the button up with the inputs (below their labels), even when an error message is shown.
+    margin-top: 1.6rem;
   }
 }
 
@@ -200,5 +202,127 @@
 
   .summary {
     position: static;
+  }
+}
+
+// Quick add: tap a menu item to add it (or add one more).
+.quick-add {
+  display: grid;
+  gap: 0.75rem;
+
+  .hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  h3 {
+    margin: 0 0 0.35rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: var(--surface-muted);
+  }
+
+  &.in-order {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  }
+
+  .chip-name {
+    font-weight: 500;
+  }
+
+  .chip-price {
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
+  .chip-qty {
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+// Quantity with − / + buttons (the native number spinners are too small to tap).
+.stepper {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+
+  button {
+    min-height: 42px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.125rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-muted);
+    }
+
+    &:first-child {
+      border-radius: 8px 0 0 8px;
+    }
+
+    &:last-child {
+      border-radius: 0 8px 8px 0;
+    }
+  }
+
+  input {
+    border-radius: 0;
+    border-inline: 0;
+    text-align: center;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+:host-context([dir='rtl']) .stepper button {
+  &:first-child {
+    border-radius: 0 8px 8px 0;
+  }
+
+  &:last-child {
+    border-radius: 8px 0 0 8px;
   }
 }

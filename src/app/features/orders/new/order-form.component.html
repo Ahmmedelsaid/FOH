@@ -75,6 +75,32 @@
         <section class="panel section" formArrayName="items">
           <h2>{{ 'form.items.heading' | t }}</h2>
 
+          <div class="quick-add" role="group" [attr.aria-label]="'form.quickAdd.title' | t">
+            <p class="hint">{{ 'form.quickAdd.hint' | t }}</p>
+            @for (group of menuGroups(); track group.category) {
+              <div class="category">
+                <h3>{{ i18n.categoryName(group.category) }}</h3>
+                <div class="chips">
+                  @for (item of group.items; track item.id) {
+                    <button
+                      type="button"
+                      class="chip"
+                      [class.in-order]="quantities().has(item.id)"
+                      [attr.aria-label]="'form.quickAdd.aria' | t: { name: i18n.menuName(item) }"
+                      (click)="quickAdd(item)"
+                    >
+                      <span class="chip-name">{{ i18n.menuName(item) }}</span>
+                      <span class="chip-price">{{ i18n.money(item.price) }}</span>
+                      @if (quantities().get(item.id); as quantity) {
+                        <span class="chip-qty">×{{ quantity }}</span>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
           @for (row of items.controls; track row; let i = $index) {
             <div class="row" [formGroupName]="i">
               <div class="field item">
@@ -100,15 +126,19 @@
 
               <div class="field qty">
                 <label [attr.for]="'qty-' + i">{{ 'form.qty.label' | t }}</label>
-                <input
-                  [id]="'qty-' + i"
-                  type="number"
-                  inputmode="numeric"
-                  min="1"
-                  max="20"
-                  formControlName="qty"
-                  [attr.aria-invalid]="!!errorMessage(row.controls.qty)"
-                />
+                <div class="stepper">
+                  <button type="button" (click)="changeQty(row, -1)" [attr.aria-label]="'form.qty.decrease' | t">−</button>
+                  <input
+                    [id]="'qty-' + i"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    max="20"
+                    formControlName="qty"
+                    [attr.aria-invalid]="!!errorMessage(row.controls.qty)"
+                  />
+                  <button type="button" (click)="changeQty(row, 1)" [attr.aria-label]="'form.qty.increase' | t">+</button>
+                </div>
                 @if (errorMessage(row.controls.qty); as message) {
                   <p class="error">{{ message }}</p>
                 }
