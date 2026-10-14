@@ -18,8 +18,12 @@ describe('ThemeService', () => {
     expect(localStorage.getItem('theme')).toBe(expected);
   });
 
-  it('uses the saved theme over the OS preference', () => {
-    localStorage.setItem('theme', 'dark');
+  it('is dark by default', () => {
     expect(TestBed.inject(ThemeService).theme()).toBe('dark');
+  });
+
+  it('uses the saved choice over the default', () => {
+    localStorage.setItem('theme', 'light');
+    expect(TestBed.inject(ThemeService).theme()).toBe('light');
   });
 });

@@ -32,6 +32,12 @@
   --warning-text: #92400e;
   --success-border: #bbf7d0;
   --served-action: #111827;
+  --accent-text: #1d4ed8;
+  --chip: #eef0f3;
+  --on-column: #fff;
+  --preparing-solid: #d97706;
+  --ready-solid: #16a34a;
+  --shadow-hover: 0 4px 14px rgb(16 24 40 / 16%);
 
   --radius: 10px;
   --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
@@ -101,7 +107,7 @@ h2 {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 40px;
+  min-height: 38px;
   padding: 0 1rem;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -138,7 +144,7 @@ h2 {
   }
 
   &--sm {
-    min-height: 34px;
+    min-height: 32px;
     padding: 0 0.75rem;
     font-size: 0.8125rem;
   }
@@ -157,7 +163,7 @@ h2 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 36px;
+    min-height: 32px;
     padding: 0 0.9rem;
     border: 0;
     border-radius: 8px;
@@ -285,31 +291,40 @@ strong,
   white-space: nowrap;
 }
 
-// Dark theme ("kitchen display"): only the tokens change, components keep using the same variables.
+// Dark theme (the default): high contrast on a near-black background, like a kitchen display.
+// Only the tokens change; components keep using the same variables.
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0f1115;
-  --surface: #1a1e25;
-  --surface-muted: #20252d;
-  --text: #e8eaed;
-  --muted: #9aa3af;
-  --border: #2a2f38;
-  --border-strong: #3a404b;
+  --bg: #0a0c0f;
+  --surface: #14181d;
+  --surface-muted: #1a1f26;
+  --text: #f4f6f8;
+  --muted: #a0a9b5;
+  --border: #262c35;
+  --border-strong: #38404b;
 
   --accent: #3b82f6;
   --accent-strong: #2563eb;
-  --new: #60a5fa;
-  --served: #9ca3af;
+  --accent-text: #7cb3ff;
+  --new: #4c9aff;
+  --preparing: #fbbf24;
+  --ready: #34d399;
+  --served: #8b95a3;
+  --preparing-solid: #d97706;
+  --ready-solid: #16a34a;
+  --on-column: #0a0c0f;
 
-  --lane: #14171c;
-  --highlight: #854d0e;
-  --segmented-bg: #262b34;
+  --lane: #0f1216;
+  --chip: #252b34;
+  --segmented-bg: #232830;
   --served-action: #4b5563;
+  --highlight: #854d0e;
 
+  --late: #ff6b6b;
+  --late-solid: #dc2626;
   --late-bg: #2a1517;
   --late-border: #7f1d1d;
   --late-text: #fca5a5;
-  --late: #f87171;
   --warning-bg: #2b2210;
   --warning-border: #78561a;
   --warning-text: #fcd34d;
@@ -317,7 +332,8 @@ strong,
   --success-bg: #10261a;
   --success-border: #14532d;
 
-  --shadow: 0 1px 2px rgb(0 0 0 / 45%);
+  --shadow: 0 1px 2px rgb(0 0 0 / 50%);
+  --shadow-hover: 0 4px 16px rgb(0 0 0 / 60%);
 }
 
 // One focus style for text fields: accent border plus a soft ring instead of a heavy outline.

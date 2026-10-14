@@ -11,7 +11,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  min-height: 60px;
+  min-height: 56px;
 }
 
 .brand {
@@ -43,7 +43,7 @@ nav {
 .link {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
+  min-height: 36px;
   padding: 0 0.75rem;
   border-radius: 8px;
   color: var(--muted);
@@ -61,7 +61,7 @@ nav {
 }
 
 main {
-  padding-block: 1.25rem 3rem;
+  padding-block: 1.1rem 2.5rem;
 }
 
 // Small screens: keep only the logo, language switch and "New order" so nothing wraps.

@@ -14,44 +14,44 @@
         {{ place() }}
       }
     </span>
-  </header>
-
-  <ul class="lines">
-    @for (line of previewLines(); track $index) {
-      <li>
-        <span class="qty ltr">{{ line.qty }}×</span>
-        <span class="name">
-          {{ line.name }}
-          @if (line.note) {
-            <span class="note">{{ line.note }}</span>
-          }
-        </span>
-      </li>
-    }
-    @if (hiddenLines() > 0) {
-      <li class="more">{{ 'card.more' | t: { count: hiddenLines() } }}</li>
-    }
-  </ul>
-
-  <p class="meta">
-    <span>
-      {{ 'card.items' | t: { count: itemCount() } }} ·
-      <strong>{{ i18n.money(total()) }}</strong>
-    </span>
-    <span class="view" aria-hidden="true">{{ 'card.view' | t }}</span>
-  </p>
-
-  <footer>
     <span class="elapsed">
-      <span>{{ elapsedLabel() }}</span>
+      {{ elapsedLabel() }}
       @if (late()) {
         <span class="late-badge">{{ 'card.late' | t }}</span>
       }
     </span>
+  </header>
+
+  <div class="body">
+    <ul class="lines">
+      @for (line of previewLines(); track $index) {
+        <li>
+          <span class="qty ltr">{{ line.qty }}×</span>
+          <span class="name">
+            {{ line.name }}
+            @if (line.note) {
+              <span class="note">{{ line.note }}</span>
+            }
+          </span>
+        </li>
+      }
+      @if (hiddenLines() > 0) {
+        <li class="more">{{ 'card.more' | t: { count: hiddenLines() } }}</li>
+      }
+    </ul>
+
+    <p class="meta">
+      <span>
+        {{ 'card.items' | t: { count: itemCount() } }} ·
+        <strong>{{ i18n.money(total()) }}</strong>
+      </span>
+      <span class="view" aria-hidden="true">{{ 'card.view' | t }}</span>
+    </p>
+
     @if (actionKey(); as key) {
       <button
         type="button"
-        class="btn btn--sm action"
+        class="btn action"
         [disabled]="pending()"
         [attr.aria-label]="'card.actionAria' | t: { action: (key | t), number: order().number }"
         (click)="advance.emit(order())"
@@ -59,5 +59,5 @@
         {{ key | t }}
       </button>
     }
-  </footer>
+  </div>
 </article>

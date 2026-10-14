@@ -1,24 +1,22 @@
+// Compact "kitchen ticket": a header band with the order number and timer, items below.
+// Dense on purpose, so many tickets fit on one screen.
+
 .card {
   --status-color: var(--served);
 
-  // The whole card opens the order (see .number::after); the action button stays clickable above it.
+  // The whole card opens the order (see .number::after); the action button sits above it.
   position: relative;
-  transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
-
-  &:hover {
-    box-shadow: 0 2px 8px rgb(16 24 40 / 14%);
-  }
-
-  display: grid;
-  gap: 0.6rem;
-  padding: 0.85rem 0.9rem;
+  overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-inline-start: 4px solid var(--status-color);
-  border-radius: var(--radius);
+  border-top: 3px solid var(--status-color);
+  border-radius: 8px;
   box-shadow: var(--shadow);
+  transition: box-shadow 0.15s;
+
+  &:hover {
+    box-shadow: var(--shadow-hover);
+  }
 
   &[data-status='new'] {
     --status-color: var(--new);
@@ -31,25 +29,27 @@
   }
 
   &.late {
-    border-color: var(--late-border);
-    border-inline-start-color: var(--late);
+    --status-color: var(--late);
   }
 
   &[data-status='served'] {
-    background: var(--surface-muted);
+    box-shadow: none;
+    opacity: 0.85;
   }
 }
 
 header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: color-mix(in srgb, var(--status-color) 12%, var(--surface));
+  border-bottom: 1px solid var(--border);
 }
 
 .number {
   font-family: var(--mono);
-  font-size: 1.0625rem;
+  font-size: 1.1875rem;
   font-weight: 700;
   color: inherit;
   text-decoration: none;
@@ -57,28 +57,61 @@ header {
   &:hover {
     text-decoration: underline;
   }
-}
 
-// Stretches the number link over the whole card so the card itself is the click target.
-.number::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius);
+  // Stretches the number link over the whole card so the card itself is the click target.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
 }
 
 .place {
   padding: 0.1rem 0.55rem;
-  border-radius: 999px;
-  background: var(--bg);
+  border-radius: 4px;
+  background: var(--chip);
   font-family: var(--mono);
   font-size: 0.8125rem;
   font-weight: 600;
 }
 
+.elapsed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+  font-family: var(--mono);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--muted);
+
+  .late & {
+    color: var(--late);
+  }
+}
+
+.late-badge {
+  padding: 0 0.4rem;
+  border-radius: 3px;
+  background: var(--late-solid);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.body {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.7rem 0.8rem 0.8rem;
+}
+
 .lines {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -90,22 +123,22 @@ header {
   }
 
   .qty {
-    min-width: 1.6rem;
+    min-width: 1.8rem;
     font-family: var(--mono);
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
   }
 
   .note {
     display: block;
     color: var(--preparing);
-    font-size: 0.8125rem;
+    font-size: 0.8rem;
     font-style: italic;
   }
 
   .more {
     color: var(--muted);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -115,8 +148,8 @@ header {
   align-items: baseline;
   gap: 0.5rem;
   margin: 0;
-  padding-top: 0.5rem;
-  border-top: 1px dashed var(--border);
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--border-strong);
   color: var(--muted);
   font-size: 0.875rem;
 
@@ -126,9 +159,9 @@ header {
 }
 
 .view {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -136,51 +169,25 @@ header {
   text-decoration: underline;
 }
 
-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.elapsed {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--mono);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--muted);
-
-  .late & {
-    color: var(--late);
-  }
-}
-
-.late-badge {
-  padding: 0.05rem 0.45rem;
-  border-radius: 999px;
-  background: var(--late-solid);
-  color: #fff;
-  font-family: system-ui, sans-serif;
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 // The action button takes the colour of the status the order is moving to.
 .action {
   // Above the stretched card link, so the button works while the rest of the card opens the order.
   position: relative;
   z-index: 1;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
   background: var(--next-color);
   color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
 
   [data-status='new'] & {
-    --next-color: var(--preparing);
+    --next-color: var(--preparing-solid);
   }
   [data-status='preparing'] & {
-    --next-color: var(--ready);
+    --next-color: var(--ready-solid);
   }
   [data-status='ready'] & {
     --next-color: var(--served-action);
