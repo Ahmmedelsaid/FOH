@@ -2,13 +2,21 @@
   <div class="container bar">
     <a class="brand" routerLink="/orders">
       <span class="logo" aria-hidden="true">K</span>
-      Kitchen Orders
+      <span class="brand-text">{{ 'app.brand' | t }}</span>
     </a>
     <nav aria-label="Main">
       <a class="link" routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        Board
+        {{ 'nav.board' | t }}
       </a>
-      <a class="btn btn--primary" routerLink="/orders/new">+ New order</a>
+      <button
+        type="button"
+        class="btn btn--secondary btn--sm lang"
+        [attr.aria-label]="'nav.switchLanguage' | t"
+        (click)="i18n.toggle()"
+      >
+        {{ 'nav.languageName' | t }}
+      </button>
+      <a class="btn btn--primary" routerLink="/orders/new">{{ 'nav.newOrder' | t }}</a>
     </nav>
   </div>
 </header>

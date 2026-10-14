@@ -68,7 +68,8 @@
   input {
     width: 100%;
     min-height: 42px;
-    padding: 0 0.75rem 0 2.35rem;
+    padding-block: 0;
+    padding-inline: 2.35rem 0.75rem;
     font: inherit;
     border: 1px solid var(--border-strong);
     border-radius: 10px;

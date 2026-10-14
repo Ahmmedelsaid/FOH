@@ -1,23 +1,24 @@
-<a class="back-link" routerLink="/orders">← Back to board</a>
+<a class="back-link" routerLink="/orders">{{ 'common.back' | t }}</a>
 
 @switch (state().kind) {
   @case ('loading') {
     <div class="state" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
-      Loading order…
+      {{ 'details.loading' | t }}
     </div>
   }
   @case ('not-found') {
     <div class="state" role="alert">
-      <h1>Order not found</h1>
-      <p>There is no order with id "{{ id() }}".</p>
-      <a class="btn btn--primary" routerLink="/orders">Go to the board</a>
+      <h1>{{ 'details.notFound.title' | t }}</h1>
+      <p>{{ 'details.notFound.body' | t: { id: id() } }}</p>
+      <a class="btn btn--primary" routerLink="/orders">{{ 'details.notFound.cta' | t }}</a>
     </div>
   }
   @case ('error') {
     <div class="state" role="alert">
-      <p>Couldn't load this order. Is the API running on port 3000?</p>
-      <button type="button" class="btn btn--primary" (click)="retry()">Try again</button>
+      <h1>{{ 'details.error.title' | t }}</h1>
+      <p>{{ 'common.checkApi' | t }}</p>
+      <button type="button" class="btn btn--primary" (click)="retry()">{{ 'common.tryAgain' | t }}</button>
     </div>
   }
   @default {
@@ -25,55 +26,55 @@
       @if (s.kind === 'loaded') {
         <article class="details panel">
           <header>
-            <h1 class="page-title">Order #{{ s.order.number }}</h1>
-            <span class="status" [attr.data-status]="s.order.status">{{ statusLabels[s.order.status] }}</span>
+            <h1 class="page-title">{{ 'details.title' | t: { number: s.order.number } }}</h1>
+            <span class="status" [attr.data-status]="s.order.status">{{ 'status.' + s.order.status | t }}</span>
           </header>
 
           <dl class="meta">
             <div>
-              <dt>Type</dt>
-              <dd>{{ typeLabels[s.order.type] }}</dd>
+              <dt>{{ 'details.type' | t }}</dt>
+              <dd>{{ 'type.' + s.order.type | t }}</dd>
             </div>
             @if (s.order.table !== null) {
               <div>
-                <dt>Table</dt>
-                <dd>{{ s.order.table }}</dd>
+                <dt>{{ 'details.table' | t }}</dt>
+                <dd class="ltr">{{ s.order.table }}</dd>
               </div>
             }
             @if (s.order.phone) {
               <div>
-                <dt>Phone</dt>
-                <dd>{{ s.order.phone }}</dd>
+                <dt>{{ 'details.phone' | t }}</dt>
+                <dd class="ltr">{{ s.order.phone }}</dd>
               </div>
             }
             <div>
-              <dt>Placed</dt>
-              <dd>{{ s.order.createdAt | date: 'medium' }}</dd>
+              <dt>{{ 'details.placed' | t }}</dt>
+              <dd>{{ i18n.dateTime(s.order.createdAt) }}</dd>
             </div>
           </dl>
 
           <table class="items">
             <caption class="sr-only">
-              Items in order {{ s.order.number }}
+              {{ 'details.caption' | t: { number: s.order.number } }}
             </caption>
             <thead>
               <tr>
-                <th scope="col">Item</th>
-                <th scope="col" class="num">Qty</th>
-                <th scope="col" class="num">Total (EGP)</th>
+                <th scope="col">{{ 'details.col.item' | t }}</th>
+                <th scope="col" class="num">{{ 'details.col.qty' | t }}</th>
+                <th scope="col" class="num">{{ 'details.col.total' | t }}</th>
               </tr>
             </thead>
             <tbody>
               @for (line of s.lines; track $index) {
                 <tr>
                   <td>
-                    {{ line.name }}
+                    {{ line.menuItem ? i18n.menuName(line.menuItem) : ('common.unknownItem' | t) }}
                     @if (line.note) {
                       <span class="note">{{ line.note }}</span>
                     }
                   </td>
                   <td class="num">{{ line.qty }}</td>
-                  <td class="num">{{ line.lineTotal | number: '1.2-2' }}</td>
+                  <td class="num">{{ i18n.number(line.lineTotal) }}</td>
                 </tr>
               }
             </tbody>
@@ -81,20 +82,20 @@
 
           <dl class="breakdown">
             <div>
-              <dt>Subtotal</dt>
-              <dd>{{ s.price.subtotal | number: '1.2-2' }}</dd>
+              <dt>{{ 'price.subtotal' | t }}</dt>
+              <dd class="ltr">{{ i18n.number(s.price.subtotal) }}</dd>
             </div>
             <div>
-              <dt>Service (12%)</dt>
-              <dd>{{ s.price.service | number: '1.2-2' }}</dd>
+              <dt>{{ 'price.service' | t }}</dt>
+              <dd class="ltr">{{ i18n.number(s.price.service) }}</dd>
             </div>
             <div>
-              <dt>VAT (14%)</dt>
-              <dd>{{ s.price.vat | number: '1.2-2' }}</dd>
+              <dt>{{ 'price.vat' | t }}</dt>
+              <dd class="ltr">{{ i18n.number(s.price.vat) }}</dd>
             </div>
             <div class="grand">
-              <dt>Total</dt>
-              <dd>EGP {{ s.price.total | number: '1.2-2' }}</dd>
+              <dt>{{ 'price.total' | t }}</dt>
+              <dd>{{ i18n.money(s.price.total) }}</dd>
             </div>
           </dl>
         </article>

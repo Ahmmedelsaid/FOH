@@ -63,3 +63,11 @@ nav {
 main {
   padding-block: 1.25rem 3rem;
 }
+
+// Small screens: keep only the logo, language switch and "New order" so nothing wraps.
+@media (max-width: 520px) {
+  .brand-text,
+  .link {
+    display: none;
+  }
+}
