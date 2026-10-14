@@ -5,9 +5,15 @@
       [routerLink]="['/orders', order().id]"
       [attr.aria-label]="'card.detailsAria' | t: { number: order().number }"
     >
-      #{{ order().number }}
+      #@for (part of numberParts(); track $index) {<span [class.match]="part.match">{{ part.text }}</span>}
     </a>
-    <span class="place" [class.ltr]="order().type === 'dine-in'" [attr.aria-label]="placeLabel()">{{ place() }}</span>
+    <span class="place" [class.ltr]="!!tableParts()" [attr.aria-label]="placeLabel()">
+      @if (tableParts(); as parts) {
+        T-@for (part of parts; track $index) {<span [class.match]="part.match">{{ part.text }}</span>}
+      } @else {
+        {{ place() }}
+      }
+    </span>
   </header>
 
   <ul class="lines">

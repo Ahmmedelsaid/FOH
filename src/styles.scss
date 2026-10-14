@@ -23,6 +23,7 @@
 
   color-scheme: light;
   --lane: #eceef2;
+  --highlight: #fde68a;
   --segmented-bg: #e5e7eb;
   --late-solid: #dc2626;
   --late-border: #fecaca;
@@ -178,7 +179,9 @@ h2 {
       box-shadow: var(--shadow);
     }
 
-    &:focus-within {
+    // Ring for keyboard focus only (focus-within also fired after a mouse click).
+    &:focus-visible,
+    &:has(input:focus-visible) {
       outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
     }
   }
@@ -299,6 +302,7 @@ strong,
   --served: #9ca3af;
 
   --lane: #14171c;
+  --highlight: #854d0e;
   --segmented-bg: #262b34;
   --served-action: #4b5563;
 
@@ -314,4 +318,12 @@ strong,
   --success-border: #14532d;
 
   --shadow: 0 1px 2px rgb(0 0 0 / 45%);
+}
+
+// One focus style for text fields: accent border plus a soft ring instead of a heavy outline.
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
 }

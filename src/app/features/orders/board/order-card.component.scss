@@ -158,3 +158,11 @@ footer {
     cursor: progress;
   }
 }
+
+// Highlights the part of the order/table number that matches the search.
+.match {
+  padding-inline: 1px;
+  border-radius: 3px;
+  background: var(--highlight);
+  color: inherit;
+}
