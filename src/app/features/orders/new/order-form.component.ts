@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject, catchError, map, of, startWith, switchMap } from 'rxjs';
 import { MenuApi } from '../../../core/api/menu-api.service';
 import { OrdersApi } from '../../../core/api/orders-api.service';
@@ -10,6 +10,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_TYPES, OrderType } from '../../../core/models/order.model';
 import { calculatePrice, itemsSubtotal, lineTotal } from '../../../core/pricing/pricing';
+import { BackLinkComponent } from '../../../shared/back-link.component';
 import { egyptianMobile, minArrayLength } from './order-form.validators';
 
 type ItemGroup = FormGroup<{
@@ -29,7 +30,7 @@ type MenuState =
 @Component({
   selector: 'app-order-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe, BackLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './order-form.component.html',
   styleUrl: './order-form.component.scss',
