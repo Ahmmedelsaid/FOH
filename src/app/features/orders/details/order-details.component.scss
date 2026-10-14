@@ -101,6 +101,11 @@
     font-family: var(--mono);
   }
 
+  // Service only applies to dine-in: keep the row so the breakdown has the same shape, but mute it.
+  .not-applicable {
+    opacity: 0.6;
+  }
+
   .grand {
     margin-top: 0.4rem;
     padding-top: 0.6rem;

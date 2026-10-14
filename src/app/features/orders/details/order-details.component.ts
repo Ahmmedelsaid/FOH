@@ -10,6 +10,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MenuItem } from '../../../core/models/menu.model';
 import { Order } from '../../../core/models/order.model';
 import { PriceBreakdown, calculatePrice, itemsSubtotal, lineTotal } from '../../../core/pricing/pricing';
+import { BackLinkComponent } from '../../../shared/back-link.component';
 
 interface DetailLine {
   /** Null when the order references a menu id that no longer exists. */
@@ -44,7 +45,7 @@ function buildDetails(order: Order, menu: MenuItem[]): DetailsState {
 @Component({
   selector: 'app-order-details',
   standalone: true,
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, BackLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './order-details.component.html',
   styleUrl: './order-details.component.scss',
