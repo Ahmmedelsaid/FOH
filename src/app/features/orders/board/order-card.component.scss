@@ -6,7 +6,7 @@
   padding: 0.85rem 0.9rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--status-color);
+  border-inline-start: 4px solid var(--status-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 
@@ -22,7 +22,7 @@
 
   &.late {
     border-color: #fecaca;
-    border-left-color: var(--late);
+    border-inline-start-color: var(--late);
   }
 
   &[data-status='served'] {

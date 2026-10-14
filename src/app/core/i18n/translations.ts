@@ -13,8 +13,7 @@ export const EN = {
   'common.unknownItem': 'Unknown item',
   'common.checkApi': 'Check that the API is running on port 3000, then try again.',
   'money': 'EGP {amount}',
-  'unit.d': 'd',
-  'unit.h': 'h',
+  'elapsed.days': '{d}d {h}h',
 
   // Order status and type
   'status.new': 'New',
@@ -143,8 +142,7 @@ export const AR: Record<TranslationKey, string> = {
   'common.unknownItem': 'صنف غير معروف',
   'common.checkApi': 'تأكد أن الـ API يعمل على المنفذ 3000 ثم حاول مرة أخرى.',
   'money': '{amount} ج.م',
-  'unit.d': 'ي',
-  'unit.h': 'س',
+  'elapsed.days': '{d} يوم {h} س',
 
   'status.new': 'جديد',
   'status.preparing': 'قيد التحضير',

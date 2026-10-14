@@ -1,17 +1,11 @@
-import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MenuItem } from '../../../core/models/menu.model';
-import { TYPE_LABELS } from '../../../core/models/order-labels';
-import { Order, OrderStatus } from '../../../core/models/order.model';
+import { Order } from '../../../core/models/order.model';
 import { calculatePrice, itemsSubtotal } from '../../../core/pricing/pricing';
 import { formatElapsed, isLate } from './elapsed';
-
-const ACTION_LABELS: Partial<Record<OrderStatus, string>> = {
-  new: 'Start preparing',
-  preparing: 'Mark ready',
-  ready: 'Mark served',
-};
 
 /** How many item lines a card shows before collapsing the rest into "+N more". */
 const PREVIEW_LINES = 3;
@@ -19,12 +13,14 @@ const PREVIEW_LINES = 3;
 @Component({
   selector: 'app-order-card',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './order-card.component.html',
   styleUrl: './order-card.component.scss',
 })
 export class OrderCardComponent {
+  protected readonly i18n = inject(I18nService);
+
   readonly order = input.required<Order>();
   readonly menu = input.required<ReadonlyMap<string, MenuItem>>();
   readonly now = input.required<number>();
@@ -34,22 +30,27 @@ export class OrderCardComponent {
 
   protected readonly place = computed(() => {
     const { type, table } = this.order();
-    return type === 'dine-in' && table !== null ? `T-${table}` : TYPE_LABELS[type];
+    return type === 'dine-in' && table !== null ? `T-${table}` : this.i18n.t(`type.${type}`);
   });
 
   protected readonly placeLabel = computed(() => {
     const { type, table } = this.order();
-    return type === 'dine-in' && table !== null ? `Table ${table}` : TYPE_LABELS[type];
+    return type === 'dine-in' && table !== null
+      ? this.i18n.t('card.table', { number: table })
+      : this.i18n.t(`type.${type}`);
   });
 
   protected readonly itemCount = computed(() => this.order().items.reduce((sum, item) => sum + item.qty, 0));
 
   protected readonly lines = computed(() =>
-    this.order().items.map((item) => ({
-      qty: item.qty,
-      name: this.menu().get(item.menuId)?.name ?? 'Unknown item',
-      note: item.note,
-    })),
+    this.order().items.map((item) => {
+      const menuItem = this.menu().get(item.menuId);
+      return {
+        qty: item.qty,
+        name: menuItem ? this.i18n.menuName(menuItem) : this.i18n.t('common.unknownItem'),
+        note: item.note,
+      };
+    }),
   );
 
   protected readonly previewLines = computed(() => this.lines().slice(0, PREVIEW_LINES));
@@ -65,8 +66,14 @@ export class OrderCardComponent {
   protected readonly late = computed(() => isLate(this.order(), this.elapsedMs()));
 
   protected readonly elapsedLabel = computed(() =>
-    this.order().status === 'served' ? 'done' : formatElapsed(this.elapsedMs()),
+    this.order().status === 'served'
+      ? this.i18n.t('card.done')
+      : formatElapsed(this.elapsedMs(), (d, h) => this.i18n.t('elapsed.days', { d, h })),
   );
 
-  protected readonly actionLabel = computed(() => ACTION_LABELS[this.order().status] ?? null);
+  /** Translation key of the action that moves the order forward, or null once it is served. */
+  protected readonly actionKey = computed(() => {
+    const status = this.order().status;
+    return status === 'served' ? null : `action.${status}`;
+  });
 }

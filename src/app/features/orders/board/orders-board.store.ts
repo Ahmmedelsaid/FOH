@@ -26,6 +26,11 @@ import { Order, OrderStatus, nextStatus } from '../../../core/models/order.model
 
 const POLL_INTERVAL_MS = 15_000;
 
+export interface MoveError {
+  number: number;
+  status: OrderStatus;
+}
+
 export type LoadState = 'loading' | 'loaded' | 'error';
 
 /**
@@ -48,7 +53,8 @@ export class OrdersBoardStore {
   readonly loadState = signal<LoadState>('loading');
   /** True when a background refresh failed but we still have data to show. */
   readonly refreshFailed = signal(false);
-  readonly actionError = signal<string | null>(null);
+  /** Which move failed; the board turns it into a translated message. */
+  readonly actionError = signal<MoveError | null>(null);
   readonly pendingIds = signal<ReadonlySet<string>>(new Set());
   /** Timestamp of the last successful refresh. */
   readonly lastUpdated = signal<number | null>(null);
@@ -98,9 +104,7 @@ export class OrdersBoardStore {
       .subscribe({
         error: () => {
           this.setStatus(order.id, previous);
-          this.actionError.set(
-            `Could not move order #${order.number} to "${target}". The change was reverted, please try again.`,
-          );
+          this.actionError.set({ number: order.number, status: target });
         },
       });
   }

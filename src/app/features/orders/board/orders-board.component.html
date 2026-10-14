@@ -1,36 +1,43 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Orders board</h1>
+    <h1 class="page-title">{{ 'board.title' | t }}</h1>
     <p class="sub">
       <span class="live" [class.stale]="store.refreshFailed()" aria-hidden="true"></span>
       @if (store.lastUpdated(); as updated) {
-        Updated {{ updated | date: 'mediumTime' }} · refreshes every 15s
+        {{ 'board.updated' | t: { time: i18n.time(updated) } }}
       } @else {
-        Connecting…
+        {{ 'board.connecting' | t }}
       }
     </p>
   </div>
   <div class="head-actions">
     @if (lateCount() > 0) {
-      <span class="late-chip">{{ lateCount() }} late</span>
+      <span class="late-chip">{{ 'board.late' | t: { count: lateCount() } }}</span>
     }
-    <button type="button" class="btn btn--secondary btn--sm" (click)="store.refresh()">Refresh</button>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="store.refresh()">
+      {{ 'board.refresh' | t }}
+    </button>
   </div>
 </div>
 
 <div class="toolbar">
   <label class="search">
-    <span class="sr-only">Search by order number or table</span>
+    <span class="sr-only">{{ 'board.searchLabel' | t }}</span>
     <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
       <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2" />
       <path d="m14 14 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
     </svg>
-    <input type="search" [formControl]="search" placeholder="Search order # or table" autocomplete="off" />
+    <input
+      type="search"
+      [formControl]="search"
+      [placeholder]="'board.searchPlaceholder' | t"
+      autocomplete="off"
+    />
   </label>
 
-  <div class="segmented" role="group" aria-label="Filter by order type">
+  <div class="segmented" role="group" [attr.aria-label]="'board.filterLabel' | t">
     <button type="button" class="segmented__item" [attr.aria-pressed]="!filters().type" (click)="setType(null)">
-      All
+      {{ 'board.filterAll' | t }}
     </button>
     @for (type of types; track type) {
       <button
@@ -39,7 +46,7 @@
         [attr.aria-pressed]="filters().type === type"
         (click)="setType(type)"
       >
-        {{ typeLabels[type] }}
+        {{ 'type.' + type | t }}
       </button>
     }
   </div>
@@ -47,58 +54,62 @@
 
 @if (createdOrder(); as number) {
   <div class="banner banner--success" role="status">
-    <span>Order #{{ number }} was created.</span>
-    <button type="button" class="btn btn--secondary btn--sm" (click)="createdOrder.set(null)">Dismiss</button>
+    <span>{{ 'board.created' | t: { number: number } }}</span>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="createdOrder.set(null)">
+      {{ 'common.dismiss' | t }}
+    </button>
   </div>
 }
 
-@if (store.actionError(); as message) {
+@if (store.actionError(); as error) {
   <div class="banner banner--error" role="alert">
-    <span>{{ message }}</span>
-    <button type="button" class="btn btn--secondary btn--sm" (click)="store.dismissError()">Dismiss</button>
+    <span>{{ 'board.moveFailed' | t: { number: error.number, status: ('status.' + error.status | t) } }}</span>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="store.dismissError()">
+      {{ 'common.dismiss' | t }}
+    </button>
   </div>
 }
 
 @if (store.refreshFailed()) {
-  <div class="banner banner--warning" role="status">
-    Couldn't refresh the board. Showing the last known orders, retrying automatically.
-  </div>
+  <div class="banner banner--warning" role="status">{{ 'board.refreshFailed' | t }}</div>
 }
 
 @switch (store.loadState()) {
   @case ('loading') {
     <div class="state" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
-      Loading orders…
+      {{ 'board.loading' | t }}
     </div>
   }
   @case ('error') {
     <div class="state" role="alert">
-      <h1>Couldn't load orders</h1>
-      <p>Check that the API is running on port 3000, then try again.</p>
-      <button type="button" class="btn btn--primary" (click)="store.refresh()">Try again</button>
+      <h1>{{ 'board.error.title' | t }}</h1>
+      <p>{{ 'common.checkApi' | t }}</p>
+      <button type="button" class="btn btn--primary" (click)="store.refresh()">{{ 'common.tryAgain' | t }}</button>
     </div>
   }
   @default {
     @if (store.orders().length === 0) {
       <div class="state">
-        <h1>No orders yet</h1>
-        <p>New orders will show up here as soon as they are placed.</p>
-        <a class="btn btn--primary" routerLink="/orders/new">Create the first order</a>
+        <h1>{{ 'board.empty.title' | t }}</h1>
+        <p>{{ 'board.empty.body' | t }}</p>
+        <a class="btn btn--primary" routerLink="/orders/new">{{ 'board.empty.cta' | t }}</a>
       </div>
     } @else if (visibleCount() === 0) {
       <div class="state">
-        <h1>No orders match your filters</h1>
-        <p>Try a different order number, table or type.</p>
-        <button type="button" class="btn btn--primary" (click)="clearFilters()">Clear filters</button>
+        <h1>{{ 'board.noMatch.title' | t }}</h1>
+        <p>{{ 'board.noMatch.body' | t }}</p>
+        <button type="button" class="btn btn--primary" (click)="clearFilters()">
+          {{ 'board.noMatch.clear' | t }}
+        </button>
       </div>
     } @else {
       <div class="columns">
         @for (column of columns(); track column.status) {
-          <section class="column" [attr.data-status]="column.status" [attr.aria-label]="column.label">
+          <section class="column" [attr.data-status]="column.status" [attr.aria-label]="'status.' + column.status | t">
             <h2>
-              <span>{{ column.label }}</span>
-              <span class="count">{{ column.orders.length }}</span>
+              <span>{{ 'status.' + column.status | t }}</span>
+              <span class="count ltr">{{ column.orders.length }}</span>
             </h2>
             @for (order of column.orders; track order.id) {
               <app-order-card
@@ -109,7 +120,7 @@
                 (advance)="store.advance($event)"
               />
             } @empty {
-              <p class="empty">Nothing here</p>
+              <p class="empty">{{ 'board.nothingHere' | t }}</p>
             }
           </section>
         }

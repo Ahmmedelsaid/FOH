@@ -79,6 +79,16 @@ export class I18nService {
     return key in this.dictionary() ? this.t(key) : category;
   }
 
+  /** 1234.5 -> '1,234.50' (same in both languages). */
+  number(value: number): string {
+    return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /** 'EGP 1,234.50' or '1,234.50 ج.م'. */
+  money(amount: number): string {
+    return this.t('money', { amount: this.number(amount) });
+  }
+
   time(timestamp: number): string {
     return new Date(timestamp).toLocaleTimeString(this.locale());
   }

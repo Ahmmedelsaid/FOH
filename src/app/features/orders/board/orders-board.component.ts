@@ -1,10 +1,11 @@
-import { DOCUMENT, DatePipe } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { STATUS_LABELS, TYPE_LABELS } from '../../../core/models/order-labels';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
 import { isLate } from './elapsed';
 import { BoardFilters, filterOrders } from './order-filters';
@@ -16,7 +17,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 @Component({
   selector: 'app-orders-board',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe, OrderCardComponent],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, OrderCardComponent],
   providers: [OrdersBoardStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './orders-board.component.html',
@@ -24,11 +25,11 @@ const SEARCH_DEBOUNCE_MS = 300;
 })
 export class OrdersBoardComponent {
   protected readonly store = inject(OrdersBoardStore);
+  protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   protected readonly types = ORDER_TYPES;
-  protected readonly typeLabels = TYPE_LABELS;
 
   /** The URL is the single source of truth for filters, so refresh and shared links keep the view. */
   private readonly queryParams = toSignal(this.route.queryParamMap, { requireSync: true });
@@ -50,7 +51,6 @@ export class OrdersBoardComponent {
     const visible = filterOrders(this.store.orders(), this.filters());
     return ORDER_STATUSES.map((status) => ({
       status,
-      label: STATUS_LABELS[status],
       orders: visible
         .filter((order) => order.status === status)
         .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)),

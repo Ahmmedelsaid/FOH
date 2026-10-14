@@ -62,3 +62,17 @@ describe('I18nService', () => {
     }
   });
 });
+
+describe('I18nService money formatting', () => {
+  it('formats amounts per language with Latin digits and two decimals', () => {
+    localStorage.removeItem('lang');
+    const service = TestBed.inject(I18nService);
+
+    expect(service.number(1234.5)).toBe('1,234.50');
+    expect(service.money(574.56)).toBe('EGP 574.56');
+
+    service.setLang('ar');
+    expect(service.money(574.56)).toBe('574.56 ج.م');
+    localStorage.removeItem('lang');
+  });
+});

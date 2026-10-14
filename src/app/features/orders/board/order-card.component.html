@@ -1,15 +1,19 @@
 <article class="card" [class.late]="late()" [attr.data-status]="order().status">
   <header>
-    <a class="number" [routerLink]="['/orders', order().id]" [attr.aria-label]="'Order ' + order().number + ' details'">
+    <a
+      class="number ltr"
+      [routerLink]="['/orders', order().id]"
+      [attr.aria-label]="'card.detailsAria' | t: { number: order().number }"
+    >
       #{{ order().number }}
     </a>
-    <span class="place" [attr.aria-label]="placeLabel()">{{ place() }}</span>
+    <span class="place" [class.ltr]="order().type === 'dine-in'" [attr.aria-label]="placeLabel()">{{ place() }}</span>
   </header>
 
   <ul class="lines">
     @for (line of previewLines(); track $index) {
       <li>
-        <span class="qty">{{ line.qty }}×</span>
+        <span class="qty ltr">{{ line.qty }}×</span>
         <span class="name">
           {{ line.name }}
           @if (line.note) {
@@ -19,30 +23,31 @@
       </li>
     }
     @if (hiddenLines() > 0) {
-      <li class="more">+{{ hiddenLines() }} more</li>
+      <li class="more">{{ 'card.more' | t: { count: hiddenLines() } }}</li>
     }
   </ul>
 
   <p class="meta">
-    {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} · <strong>EGP {{ total() | number: '1.2-2' }}</strong>
+    {{ 'card.items' | t: { count: itemCount() } }} ·
+    <strong>{{ i18n.money(total()) }}</strong>
   </p>
 
   <footer>
     <span class="elapsed">
-      {{ elapsedLabel() }}
+      <span>{{ elapsedLabel() }}</span>
       @if (late()) {
-        <span class="late-badge">Late</span>
+        <span class="late-badge">{{ 'card.late' | t }}</span>
       }
     </span>
-    @if (actionLabel(); as label) {
+    @if (actionKey(); as key) {
       <button
         type="button"
         class="btn btn--sm action"
         [disabled]="pending()"
-        [attr.aria-label]="label + ', order ' + order().number"
+        [attr.aria-label]="'card.actionAria' | t: { action: (key | t), number: order().number }"
         (click)="advance.emit(order())"
       >
-        {{ label }}
+        {{ key | t }}
       </button>
     }
   </footer>

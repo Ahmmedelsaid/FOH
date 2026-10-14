@@ -251,3 +251,22 @@ h2 {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+
+// Numbers, order codes and times stay left-to-right (and isolated) inside Arabic text.
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.ltr-input {
+  direction: ltr;
+}
+
+strong,
+.amount {
+  unicode-bidi: isolate;
+}
+
+.btn {
+  white-space: nowrap;
+}
