@@ -49,13 +49,13 @@ describe('OrderCardComponent', () => {
     expect(text).toContain('4 items');
     expect(text).toContain('EGP 574.56');
     expect(text).toContain('02:14');
-    expect(text).not.toContain('late');
+    expect(text).not.toContain('Late');
   });
 
   it('is marked late after 20 minutes', () => {
     const element = render({ now: CREATED + 21 * 60_000 });
     expect(element.querySelector('.card')?.classList).toContain('late');
-    expect(element.textContent).toContain('late');
+    expect(element.textContent).toContain('Late');
   });
 
   it('emits the order when the action is clicked and disables it while pending', () => {

@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,7 +9,7 @@ import { OrdersApi } from '../../../core/api/orders-api.service';
 import { MenuItem } from '../../../core/models/menu.model';
 import { TYPE_LABELS } from '../../../core/models/order-labels';
 import { ORDER_TYPES, OrderType } from '../../../core/models/order.model';
-import { calculatePrice, itemsSubtotal } from '../../../core/pricing/pricing';
+import { calculatePrice, itemsSubtotal, lineTotal } from '../../../core/pricing/pricing';
 import { egyptianMobile, minArrayLength } from './order-form.validators';
 
 type ItemGroup = FormGroup<{
@@ -36,6 +36,7 @@ export class OrderFormComponent {
   private readonly ordersApi = inject(OrdersApi);
   private readonly menuApi = inject(MenuApi);
   private readonly router = inject(Router);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly reloadMenu$ = new Subject<void>();
 
   protected readonly types = ORDER_TYPES;
@@ -93,6 +94,14 @@ export class OrderFormComponent {
     return calculatePrice(itemsSubtotal(items, this.menuById()), type);
   });
 
+  /** One line per picked item for the summary panel (rows without an item yet are skipped). */
+  protected readonly summaryLines = computed(() => {
+    const menu = this.menuById();
+    return this.formValue()
+      .items.filter((item) => menu.has(item.menuId))
+      .map((item) => ({ qty: item.qty, name: menu.get(item.menuId)?.name ?? '', total: lineTotal(item, menu) }));
+  });
+
   constructor() {
     const { type } = this.form.controls;
     type.valueChanges
@@ -123,6 +132,7 @@ export class OrderFormComponent {
     }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.focusFirstProblem();
       return;
     }
 
@@ -139,7 +149,7 @@ export class OrderFormComponent {
       })
       .subscribe({
         // Stay in the submitting state on success so the button can't be clicked again while navigating.
-        next: () => void this.router.navigate(['/orders']),
+        next: (order) => void this.router.navigate(['/orders'], { state: { createdOrder: order.number } }),
         error: () => {
           this.submitting.set(false);
           this.submitError.set("Couldn't create the order. Please check your connection and try again.");
@@ -168,6 +178,14 @@ export class OrderFormComponent {
       return `Must be at most ${errors['max'].max}.`;
     }
     return 'This value is not valid.';
+  }
+
+  private focusFirstProblem(): void {
+    const root = this.host.nativeElement;
+    const target =
+      root.querySelector<HTMLElement>('input.ng-invalid, select.ng-invalid') ??
+      root.querySelector<HTMLElement>('[data-add-item]');
+    target?.focus();
   }
 
   private createItem(): ItemGroup {

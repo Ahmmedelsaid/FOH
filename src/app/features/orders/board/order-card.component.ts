@@ -13,6 +13,9 @@ const ACTION_LABELS: Partial<Record<OrderStatus, string>> = {
   ready: 'Mark served',
 };
 
+/** How many item lines a card shows before collapsing the rest into "+N more". */
+const PREVIEW_LINES = 3;
+
 @Component({
   selector: 'app-order-card',
   standalone: true,
@@ -34,7 +37,23 @@ export class OrderCardComponent {
     return type === 'dine-in' && table !== null ? `T-${table}` : TYPE_LABELS[type];
   });
 
+  protected readonly placeLabel = computed(() => {
+    const { type, table } = this.order();
+    return type === 'dine-in' && table !== null ? `Table ${table}` : TYPE_LABELS[type];
+  });
+
   protected readonly itemCount = computed(() => this.order().items.reduce((sum, item) => sum + item.qty, 0));
+
+  protected readonly lines = computed(() =>
+    this.order().items.map((item) => ({
+      qty: item.qty,
+      name: this.menu().get(item.menuId)?.name ?? 'Unknown item',
+      note: item.note,
+    })),
+  );
+
+  protected readonly previewLines = computed(() => this.lines().slice(0, PREVIEW_LINES));
+  protected readonly hiddenLines = computed(() => Math.max(0, this.lines().length - PREVIEW_LINES));
 
   protected readonly total = computed(() => {
     const { items, type } = this.order();

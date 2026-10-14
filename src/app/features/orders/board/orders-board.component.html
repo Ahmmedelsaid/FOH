@@ -1,28 +1,66 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Orders board</h1>
+    <p class="sub">
+      <span class="live" [class.stale]="store.refreshFailed()" aria-hidden="true"></span>
+      @if (store.lastUpdated(); as updated) {
+        Updated {{ updated | date: 'mediumTime' }} · refreshes every 15s
+      } @else {
+        Connecting…
+      }
+    </p>
+  </div>
+  <div class="head-actions">
+    @if (lateCount() > 0) {
+      <span class="late-chip">{{ lateCount() }} late</span>
+    }
+    <button type="button" class="btn btn--secondary btn--sm" (click)="store.refresh()">Refresh</button>
+  </div>
+</div>
+
 <div class="toolbar">
   <label class="search">
     <span class="sr-only">Search by order number or table</span>
+    <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+      <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m14 14 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
     <input type="search" [formControl]="search" placeholder="Search order # or table" autocomplete="off" />
   </label>
 
-  <div class="types" role="group" aria-label="Filter by order type">
-    <button type="button" [attr.aria-pressed]="!filters().type" (click)="setType(null)">All</button>
+  <div class="segmented" role="group" aria-label="Filter by order type">
+    <button type="button" class="segmented__item" [attr.aria-pressed]="!filters().type" (click)="setType(null)">
+      All
+    </button>
     @for (type of types; track type) {
-      <button type="button" [attr.aria-pressed]="filters().type === type" (click)="setType(type)">
+      <button
+        type="button"
+        class="segmented__item"
+        [attr.aria-pressed]="filters().type === type"
+        (click)="setType(type)"
+      >
         {{ typeLabels[type] }}
       </button>
     }
   </div>
 </div>
 
+@if (createdOrder(); as number) {
+  <div class="banner banner--success" role="status">
+    <span>Order #{{ number }} was created.</span>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="createdOrder.set(null)">Dismiss</button>
+  </div>
+}
+
 @if (store.actionError(); as message) {
-  <div class="banner error" role="alert">
+  <div class="banner banner--error" role="alert">
     <span>{{ message }}</span>
-    <button type="button" (click)="store.dismissError()">Dismiss</button>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="store.dismissError()">Dismiss</button>
   </div>
 }
 
 @if (store.refreshFailed()) {
-  <div class="banner warning" role="status">
+  <div class="banner banner--warning" role="status">
     Couldn't refresh the board. Showing the last known orders, retrying automatically.
   </div>
 }
@@ -36,22 +74,23 @@
   }
   @case ('error') {
     <div class="state" role="alert">
-      <p>Couldn't load orders. Is the API running on port 3000?</p>
-      <button type="button" class="primary" (click)="store.retry()">Try again</button>
+      <h1>Couldn't load orders</h1>
+      <p>Check that the API is running on port 3000, then try again.</p>
+      <button type="button" class="btn btn--primary" (click)="store.refresh()">Try again</button>
     </div>
   }
   @default {
     @if (store.orders().length === 0) {
       <div class="state">
-        <p>No orders yet.</p>
-        <a class="primary" routerLink="/orders/new">Create the first order</a>
+        <h1>No orders yet</h1>
+        <p>New orders will show up here as soon as they are placed.</p>
+        <a class="btn btn--primary" routerLink="/orders/new">Create the first order</a>
       </div>
     } @else if (visibleCount() === 0) {
       <div class="state">
-        <p>No orders match your filters.</p>
-        @if (hasFilters()) {
-          <button type="button" class="primary" (click)="clearFilters()">Clear filters</button>
-        }
+        <h1>No orders match your filters</h1>
+        <p>Try a different order number, table or type.</p>
+        <button type="button" class="btn btn--primary" (click)="clearFilters()">Clear filters</button>
       </div>
     } @else {
       <div class="columns">

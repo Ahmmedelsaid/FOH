@@ -50,6 +50,8 @@ export class OrdersBoardStore {
   readonly refreshFailed = signal(false);
   readonly actionError = signal<string | null>(null);
   readonly pendingIds = signal<ReadonlySet<string>>(new Set());
+  /** Timestamp of the last successful refresh. */
+  readonly lastUpdated = signal<number | null>(null);
   /** Shared clock for all cards, ticking every second. */
   readonly now = signal(Date.now());
 
@@ -60,7 +62,7 @@ export class OrdersBoardStore {
     this.startPolling();
   }
 
-  retry(): void {
+  refresh(): void {
     if (this.loadState() === 'error') {
       this.loadState.set('loading');
     }
@@ -135,6 +137,7 @@ export class OrdersBoardStore {
         }
         this.loadState.set('loaded');
         this.refreshFailed.set(false);
+        this.lastUpdated.set(Date.now());
       }),
       catchError(() => {
         if (this.loadState() === 'loaded') {
