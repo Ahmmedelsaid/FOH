@@ -1,4 +1,4 @@
-<a class="back" routerLink="/orders">← Back to board</a>
+<a class="back-link" routerLink="/orders">← Back to board</a>
 
 @switch (state().kind) {
   @case ('loading') {
@@ -11,21 +11,21 @@
     <div class="state" role="alert">
       <h1>Order not found</h1>
       <p>There is no order with id "{{ id() }}".</p>
-      <a class="primary" routerLink="/orders">Go to the board</a>
+      <a class="btn btn--primary" routerLink="/orders">Go to the board</a>
     </div>
   }
   @case ('error') {
     <div class="state" role="alert">
       <p>Couldn't load this order. Is the API running on port 3000?</p>
-      <button type="button" class="primary" (click)="retry()">Try again</button>
+      <button type="button" class="btn btn--primary" (click)="retry()">Try again</button>
     </div>
   }
   @default {
     @if (state(); as s) {
       @if (s.kind === 'loaded') {
-        <article class="details">
+        <article class="details panel">
           <header>
-            <h1>Order #{{ s.order.number }}</h1>
+            <h1 class="page-title">Order #{{ s.order.number }}</h1>
             <span class="status" [attr.data-status]="s.order.status">{{ statusLabels[s.order.status] }}</span>
           </header>
 
