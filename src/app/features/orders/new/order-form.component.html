@@ -1,45 +1,46 @@
-<a class="back-link" routerLink="/orders">← Back to board</a>
+<a class="back-link" routerLink="/orders">{{ 'common.back' | t }}</a>
 
 @switch (menuState().kind) {
   @case ('loading') {
     <div class="state" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
-      Loading menu…
+      {{ 'form.menu.loading' | t }}
     </div>
   }
   @case ('error') {
     <div class="state" role="alert">
-      <h1>Couldn't load the menu</h1>
-      <p>Check that the API is running on port 3000, then try again.</p>
-      <button type="button" class="btn btn--primary" (click)="retryMenu()">Try again</button>
+      <h1>{{ 'form.menu.error' | t }}</h1>
+      <p>{{ 'common.checkApi' | t }}</p>
+      <button type="button" class="btn btn--primary" (click)="retryMenu()">{{ 'common.tryAgain' | t }}</button>
     </div>
   }
   @default {
-    <h1 class="page-title">New order</h1>
+    <h1 class="page-title">{{ 'form.title' | t }}</h1>
 
     <form class="layout" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="main">
         <section class="panel section">
-          <h2>Order type</h2>
-          <div class="segmented" role="radiogroup" aria-label="Order type">
+          <h2>{{ 'form.orderType' | t }}</h2>
+          <div class="segmented" role="radiogroup" [attr.aria-label]="'form.orderType' | t">
             @for (type of types; track type) {
               <label class="segmented__item" [class.is-selected]="form.controls.type.value === type">
                 <input class="sr-only" type="radio" formControlName="type" [value]="type" />
-                {{ typeLabels[type] }}
+                {{ 'type.' + type | t }}
               </label>
             }
           </div>
 
           @if (form.controls.type.value === 'dine-in') {
             <div class="field narrow">
-              <label for="table">Table number</label>
+              <label for="table">{{ 'form.table.label' | t }}</label>
               <input
                 id="table"
+                class="ltr-input"
                 type="number"
                 inputmode="numeric"
                 min="1"
                 max="40"
-                placeholder="1–40"
+                [placeholder]="'form.table.placeholder' | t"
                 formControlName="table"
                 [attr.aria-invalid]="!!errorMessage(form.controls.table)"
                 [attr.aria-describedby]="errorMessage(form.controls.table) ? 'table-error' : null"
@@ -52,9 +53,10 @@
 
           @if (form.controls.type.value === 'delivery') {
             <div class="field medium">
-              <label for="phone">Customer mobile number</label>
+              <label for="phone">{{ 'form.phone.label' | t }}</label>
               <input
                 id="phone"
+                class="ltr-input"
                 type="tel"
                 inputmode="numeric"
                 placeholder="01012345678"
@@ -71,29 +73,33 @@
         </section>
 
         <section class="panel section" formArrayName="items">
-          <h2>Items</h2>
+          <h2>{{ 'form.items.heading' | t }}</h2>
 
           @for (row of items.controls; track row; let i = $index) {
             <div class="row" [formGroupName]="i">
               <div class="field item">
-                <label [attr.for]="'menu-' + i">Item</label>
-                <select [id]="'menu-' + i" formControlName="menuId" [attr.aria-invalid]="!!errorMessage(row.controls.menuId)">
-                  <option value="" disabled>Select an item…</option>
+                <label [attr.for]="'menu-' + i">{{ 'form.item.label' | t }}</label>
+                <select
+                  [id]="'menu-' + i"
+                  formControlName="menuId"
+                  [attr.aria-invalid]="!!errorMessage(row.controls.menuId)"
+                >
+                  <option value="" disabled>{{ 'form.item.placeholder' | t }}</option>
                   @for (group of menuGroups(); track group.category) {
-                    <optgroup [label]="group.category">
+                    <optgroup [label]="i18n.categoryName(group.category)">
                       @for (item of group.items; track item.id) {
-                        <option [value]="item.id">{{ item.name }} · EGP {{ item.price }}</option>
+                        <option [value]="item.id">{{ i18n.menuName(item) }} · {{ i18n.money(item.price) }}</option>
                       }
                     </optgroup>
                   }
                 </select>
                 @if (errorMessage(row.controls.menuId)) {
-                  <p class="error">Choose an item.</p>
+                  <p class="error">{{ 'form.item.choose' | t }}</p>
                 }
               </div>
 
               <div class="field qty">
-                <label [attr.for]="'qty-' + i">Qty</label>
+                <label [attr.for]="'qty-' + i">{{ 'form.qty.label' | t }}</label>
                 <input
                   [id]="'qty-' + i"
                   type="number"
@@ -112,17 +118,19 @@
                 type="button"
                 class="btn btn--secondary btn--sm remove"
                 (click)="removeItem(i)"
-                [attr.aria-label]="'Remove item ' + (i + 1)"
+                [attr.aria-label]="'form.remove.aria' | t: { number: i + 1 }"
               >
                 ✕
               </button>
 
               <div class="field note">
-                <label [attr.for]="'note-' + i">Note <span class="optional">(optional)</span></label>
+                <label [attr.for]="'note-' + i">
+                  {{ 'form.note.label' | t }} <span class="optional">{{ 'form.note.optional' | t }}</span>
+                </label>
                 <input
                   [id]="'note-' + i"
                   type="text"
-                  placeholder="e.g. no onions"
+                  [placeholder]="'form.note.placeholder' | t"
                   autocomplete="off"
                   formControlName="note"
                 />
@@ -131,24 +139,26 @@
           }
 
           @if (items.errors && items.touched) {
-            <p class="error" role="alert">Add at least one item to create the order.</p>
+            <p class="error" role="alert">{{ 'form.items.required' | t }}</p>
           }
 
-          <button type="button" class="btn btn--secondary add" data-add-item (click)="addItem()">+ Add item</button>
+          <button type="button" class="btn btn--secondary add" data-add-item (click)="addItem()">
+            {{ 'form.add' | t }}
+          </button>
         </section>
       </div>
 
-      <aside class="panel summary" aria-label="Order summary">
-        <h2>Summary</h2>
+      <aside class="panel summary" [attr.aria-label]="'form.summary.title' | t">
+        <h2>{{ 'form.summary.title' | t }}</h2>
 
         @if (summaryLines().length === 0) {
-          <p class="muted">No items yet.</p>
+          <p class="muted">{{ 'form.summary.empty' | t }}</p>
         } @else {
           <ul class="summary-lines">
             @for (line of summaryLines(); track $index) {
               <li>
                 <span>{{ line.qty }}× {{ line.name }}</span>
-                <span class="amount">{{ line.total | number: '1.2-2' }}</span>
+                <span class="amount ltr">{{ i18n.number(line.total) }}</span>
               </li>
             }
           </ul>
@@ -156,29 +166,29 @@
 
         <dl class="total" aria-live="polite">
           <div>
-            <dt>Subtotal</dt>
-            <dd>{{ price().subtotal | number: '1.2-2' }}</dd>
+            <dt>{{ 'price.subtotal' | t }}</dt>
+            <dd class="ltr">{{ i18n.number(price().subtotal) }}</dd>
           </div>
           <div>
-            <dt>Service (12%)</dt>
-            <dd>{{ price().service | number: '1.2-2' }}</dd>
+            <dt>{{ 'price.service' | t }}</dt>
+            <dd class="ltr">{{ i18n.number(price().service) }}</dd>
           </div>
           <div>
-            <dt>VAT (14%)</dt>
-            <dd>{{ price().vat | number: '1.2-2' }}</dd>
+            <dt>{{ 'price.vat' | t }}</dt>
+            <dd class="ltr">{{ i18n.number(price().vat) }}</dd>
           </div>
           <div class="grand">
-            <dt>Total</dt>
-            <dd>EGP {{ price().total | number: '1.2-2' }}</dd>
+            <dt>{{ 'price.total' | t }}</dt>
+            <dd>{{ i18n.money(price().total) }}</dd>
           </div>
         </dl>
 
-        @if (submitError(); as message) {
-          <p class="banner banner--error" role="alert">{{ message }}</p>
+        @if (submitError()) {
+          <p class="banner banner--error" role="alert">{{ 'form.submitError' | t }}</p>
         }
 
         <button type="submit" class="btn btn--primary submit" [disabled]="submitting()">
-          {{ submitting() ? 'Creating…' : 'Create order' }}
+          {{ (submitting() ? 'form.creating' : 'form.submit') | t }}
         </button>
       </aside>
     </form>

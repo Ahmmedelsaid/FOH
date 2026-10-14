@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,7 +6,8 @@ import { Subject, catchError, map, of, startWith, switchMap } from 'rxjs';
 import { MenuApi } from '../../../core/api/menu-api.service';
 import { OrdersApi } from '../../../core/api/orders-api.service';
 import { MenuItem } from '../../../core/models/menu.model';
-import { TYPE_LABELS } from '../../../core/models/order-labels';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_TYPES, OrderType } from '../../../core/models/order.model';
 import { calculatePrice, itemsSubtotal, lineTotal } from '../../../core/pricing/pricing';
 import { egyptianMobile, minArrayLength } from './order-form.validators';
@@ -26,7 +26,7 @@ type MenuState =
 @Component({
   selector: 'app-order-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DecimalPipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './order-form.component.html',
   styleUrl: './order-form.component.scss',
@@ -40,7 +40,7 @@ export class OrderFormComponent {
   private readonly reloadMenu$ = new Subject<void>();
 
   protected readonly types = ORDER_TYPES;
-  protected readonly typeLabels = TYPE_LABELS;
+  protected readonly i18n = inject(I18nService);
 
   protected readonly form = this.fb.group({
     type: this.fb.control<OrderType>('dine-in'),
@@ -50,7 +50,7 @@ export class OrderFormComponent {
   });
 
   protected readonly submitting = signal(false);
-  protected readonly submitError = signal<string | null>(null);
+  protected readonly submitError = signal(false);
 
   protected readonly menuState = toSignal(
     this.reloadMenu$.pipe(
@@ -97,9 +97,10 @@ export class OrderFormComponent {
   /** One line per picked item for the summary panel (rows without an item yet are skipped). */
   protected readonly summaryLines = computed(() => {
     const menu = this.menuById();
-    return this.formValue()
-      .items.filter((item) => menu.has(item.menuId))
-      .map((item) => ({ qty: item.qty, name: menu.get(item.menuId)?.name ?? '', total: lineTotal(item, menu) }));
+    return this.formValue().items.flatMap((item) => {
+      const menuItem = menu.get(item.menuId);
+      return menuItem ? [{ qty: item.qty, name: this.i18n.menuName(menuItem), total: lineTotal(item, menu) }] : [];
+    });
   });
 
   constructor() {
@@ -138,7 +139,7 @@ export class OrderFormComponent {
 
     const { type, table, phone, items } = this.form.getRawValue();
     this.submitting.set(true);
-    this.submitError.set(null);
+    this.submitError.set(false);
 
     this.ordersApi
       .create({
@@ -152,7 +153,7 @@ export class OrderFormComponent {
         next: (order) => void this.router.navigate(['/orders'], { state: { createdOrder: order.number } }),
         error: () => {
           this.submitting.set(false);
-          this.submitError.set("Couldn't create the order. Please check your connection and try again.");
+          this.submitError.set(true);
         },
       });
   }
@@ -163,21 +164,21 @@ export class OrderFormComponent {
     }
     const errors = control.errors;
     if (errors['required']) {
-      return 'This field is required.';
+      return this.i18n.t('error.required');
     }
     if (errors['egyptianMobile']) {
-      return 'Enter an Egyptian mobile number, e.g. 01012345678.';
+      return this.i18n.t('error.mobile');
     }
     if (errors['pattern']) {
-      return 'Enter a whole number.';
+      return this.i18n.t('error.integer');
     }
     if (errors['min']) {
-      return `Must be at least ${errors['min'].min}.`;
+      return this.i18n.t('error.min', { min: errors['min'].min });
     }
     if (errors['max']) {
-      return `Must be at most ${errors['max'].max}.`;
+      return this.i18n.t('error.max', { max: errors['max'].max });
     }
-    return 'This value is not valid.';
+    return this.i18n.t('error.invalid');
   }
 
   private focusFirstProblem(): void {
