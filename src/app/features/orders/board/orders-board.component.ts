@@ -8,7 +8,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
 import { isLate } from './elapsed';
-import { BoardFilters, filterOrders, normalizeQuery } from './order-filters';
+import { BoardFilters, filterOrders } from './order-filters';
 import { OrderCardComponent } from './order-card.component';
 import { OrdersBoardStore } from './orders-board.store';
 
@@ -46,8 +46,6 @@ export class OrdersBoardComponent {
   protected readonly search = new FormControl(this.filters().query, { nonNullable: true });
   /** What is typed right now (before the debounce), used to show the clear button instantly. */
   protected readonly searchText = signal(this.filters().query);
-  /** Search text as the cards should highlight it. */
-  protected readonly needle = computed(() => normalizeQuery(this.filters().query));
   protected readonly isFiltered = computed(() => !!this.filters().query || !!this.filters().type);
 
   /** Last query we wrote to the URL, so we can tell our own navigations from back/forward ones. */

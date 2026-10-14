@@ -53,7 +53,7 @@ Not done: deployed demo.
 
 - Card total shows the **grand total** (service + VAT included). The task sketch shows subtotals, so this is a deliberate difference.
 - Item count on a card is the sum of quantities (#1041 shows "4 items", matching the sketch).
-- Search matches order number or table number by substring; a leading `#` is ignored.
+- Search: `T7`, `t-7` or `table 7` find table 7; `#1043` or any 3+ digit number searches order numbers (substring); a 1-2 digit number is a table (exact), because tables only go up to 40. A plain substring match made `4` return every order #104x.
 - Seed orders are old, so New/Preparing ones show as late (expected per the task).
 - The "late" marker is shown with text as well as colour. Served orders show "done" instead of a timer.
 - Quick add merges taps on the same item into one row (quantity goes up). Rows added by hand with "Add item" can still repeat an item.

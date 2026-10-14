@@ -1,6 +1,6 @@
 import { Order } from '../../../core/models/order.model';
 import { LATE_AFTER_MS, formatElapsed, isLate } from './elapsed';
-import { filterOrders, splitMatch } from './order-filters';
+import { filterOrders, parseQuery, splitMatch } from './order-filters';
 
 const order = (overrides: Partial<Order>): Order => ({
   id: '1',
@@ -74,5 +74,55 @@ describe('splitMatch', () => {
   it('returns the text untouched when there is no query or no match', () => {
     expect(splitMatch('1043', '')).toEqual([{ text: '1043', match: false }]);
     expect(splitMatch('1043', '99')).toEqual([{ text: '1043', match: false }]);
+  });
+});
+
+describe('parseQuery', () => {
+  it('reads table syntaxes as an exact table', () => {
+    for (const text of ['T4', 't-4', 'table 4', 'Table4', '4', '04']) {
+      expect(parseQuery(text)).withContext(text).toEqual({ kind: 'table', value: '4' });
+    }
+  });
+
+  it('reads # and 3+ digits as an order number', () => {
+    expect(parseQuery('#1043')).toEqual({ kind: 'order', value: '1043' });
+    expect(parseQuery('# 104')).toEqual({ kind: 'order', value: '104' });
+    expect(parseQuery('104')).toEqual({ kind: 'order', value: '104' });
+  });
+
+  it('does not filter while only a prefix is typed', () => {
+    for (const text of ['', '  ', '#', 't', 'table']) {
+      expect(parseQuery(text)).withContext(text).toBeNull();
+    }
+  });
+});
+
+describe('filterOrders search rules', () => {
+  const orders = ['1040:11', '1041:7', '1042:2', '1043:', '1044:', '1045:4'].map((entry) => {
+    const [number, table] = entry.split(':');
+    return order({
+      id: number,
+      number: Number(number),
+      table: table ? Number(table) : null,
+      type: table ? 'dine-in' : 'takeaway',
+    });
+  });
+  const ids = (query: string) => filterOrders(orders, { query, type: null }).map((o) => o.id);
+
+  it('a short number finds that table only, not every order #104x', () => {
+    expect(ids('4')).toEqual(['1045']);
+    expect(ids('1')).toEqual([]);
+    expect(ids('11')).toEqual(['1040']);
+  });
+
+  it('T7 and table 7 find table 7', () => {
+    expect(ids('T7')).toEqual(['1041']);
+    expect(ids('table 7')).toEqual(['1041']);
+  });
+
+  it('longer numbers search order numbers, never tables', () => {
+    expect(ids('1043')).toEqual(['1043']);
+    expect(ids('104')).toHaveSize(6);
+    expect(ids('#1045')).toEqual(['1045']);
   });
 });
