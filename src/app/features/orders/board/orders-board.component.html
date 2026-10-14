@@ -32,7 +32,13 @@
       [formControl]="search"
       [placeholder]="'board.searchPlaceholder' | t"
       autocomplete="off"
+      (keydown.escape)="clearSearch()"
     />
+    @if (searchText()) {
+      <button type="button" class="clear-search" [attr.aria-label]="'board.clearSearch' | t" (click)="clearSearch()">
+        ✕
+      </button>
+    }
   </label>
 
   <div class="segmented" role="group" [attr.aria-label]="'board.filterLabel' | t">
@@ -51,6 +57,13 @@
     }
   </div>
 </div>
+
+@if (isFiltered() && store.orders().length > 0) {
+  <p class="results" role="status" aria-live="polite">
+    <span>{{ 'board.results' | t: { shown: visibleCount(), total: store.orders().length } }}</span>
+    <button type="button" class="link-btn" (click)="clearFilters()">{{ 'board.noMatch.clear' | t }}</button>
+  </p>
+}
 
 @if (createdOrder(); as number) {
   <div class="banner banner--success" role="status">
@@ -106,7 +119,12 @@
     } @else {
       <div class="columns">
         @for (column of columns(); track column.status) {
-          <section class="column" [attr.data-status]="column.status" [attr.aria-label]="'status.' + column.status | t">
+          <section
+            class="column"
+            [class.dimmed]="isFiltered() && column.orders.length === 0"
+            [attr.data-status]="column.status"
+            [attr.aria-label]="'status.' + column.status | t"
+          >
             <h2>
               <span>{{ 'status.' + column.status | t }}</span>
               <span class="count ltr">{{ column.orders.length }}</span>
@@ -116,6 +134,7 @@
                 [order]="order"
                 [menu]="store.menu()"
                 [now]="store.now()"
+                [query]="needle()"
                 [pending]="store.pendingIds().has(order.id)"
                 (advance)="store.advance($event)"
               />

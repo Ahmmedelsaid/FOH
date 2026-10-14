@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
 import { isLate } from './elapsed';
-import { BoardFilters, filterOrders } from './order-filters';
+import { BoardFilters, filterOrders, normalizeQuery } from './order-filters';
 import { OrderCardComponent } from './order-card.component';
 import { OrdersBoardStore } from './orders-board.store';
 
@@ -44,6 +44,12 @@ export class OrdersBoardComponent {
   protected readonly createdOrder = signal<number | null>(this.consumeCreatedOrder());
 
   protected readonly search = new FormControl(this.filters().query, { nonNullable: true });
+  /** What is typed right now (before the debounce), used to show the clear button instantly. */
+  protected readonly searchText = signal(this.filters().query);
+  /** Search text as the cards should highlight it. */
+  protected readonly needle = computed(() => normalizeQuery(this.filters().query));
+  protected readonly isFiltered = computed(() => !!this.filters().query || !!this.filters().type);
+
   /** Last query we wrote to the URL, so we can tell our own navigations from back/forward ones. */
   private lastPushedQuery = this.filters().query;
 
@@ -68,7 +74,12 @@ export class OrdersBoardComponent {
 
   constructor() {
     this.search.valueChanges
-      .pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed())
+      .pipe(
+        tap((value) => this.searchText.set(value)),
+        debounceTime(SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
       .subscribe((value) => {
         const query = value.trim();
         this.lastPushedQuery = query;
@@ -81,6 +92,7 @@ export class OrdersBoardComponent {
       if (query !== this.lastPushedQuery) {
         this.lastPushedQuery = query;
         this.search.setValue(query, { emitEvent: false });
+        this.searchText.set(query);
       }
     });
   }
@@ -89,8 +101,17 @@ export class OrdersBoardComponent {
     this.updateParams({ type });
   }
 
+  /** Clears the search immediately (no debounce) and keeps the type filter. */
+  protected clearSearch(): void {
+    this.search.setValue('', { emitEvent: false });
+    this.searchText.set('');
+    this.lastPushedQuery = '';
+    this.updateParams({ q: null });
+  }
+
   protected clearFilters(): void {
     this.search.setValue('', { emitEvent: false });
+    this.searchText.set('');
     this.lastPushedQuery = '';
     this.updateParams({ q: null, type: null });
   }
