@@ -1,16 +1,43 @@
-<article class="card" [class.late]="late()">
+<article class="card" [class.late]="late()" [attr.data-status]="order().status">
   <header>
-    <a class="number" [routerLink]="['/orders', order().id]">#{{ order().number }}</a>
-    <span class="place">{{ place() }}</span>
+    <a class="number" [routerLink]="['/orders', order().id]" [attr.aria-label]="'Order ' + order().number + ' details'">
+      #{{ order().number }}
+    </a>
+    <span class="place" [attr.aria-label]="placeLabel()">{{ place() }}</span>
   </header>
+
+  <ul class="lines">
+    @for (line of previewLines(); track $index) {
+      <li>
+        <span class="qty">{{ line.qty }}×</span>
+        <span class="name">
+          {{ line.name }}
+          @if (line.note) {
+            <span class="note">{{ line.note }}</span>
+          }
+        </span>
+      </li>
+    }
+    @if (hiddenLines() > 0) {
+      <li class="more">+{{ hiddenLines() }} more</li>
+    }
+  </ul>
+
   <p class="meta">
-    {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} · EGP {{ total() | number: '1.2-2' }}
+    {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} · <strong>EGP {{ total() | number: '1.2-2' }}</strong>
   </p>
+
   <footer>
-    <span class="elapsed">{{ elapsedLabel() }}@if (late()) { · late }</span>
+    <span class="elapsed">
+      {{ elapsedLabel() }}
+      @if (late()) {
+        <span class="late-badge">Late</span>
+      }
+    </span>
     @if (actionLabel(); as label) {
       <button
         type="button"
+        class="btn btn--sm action"
         [disabled]="pending()"
         [attr.aria-label]="label + ', order ' + order().number"
         (click)="advance.emit(order())"

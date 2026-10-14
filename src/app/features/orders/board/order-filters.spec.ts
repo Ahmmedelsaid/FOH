@@ -43,6 +43,7 @@ describe('elapsed', () => {
     expect(formatElapsed(134_000)).toBe('02:14');
     expect(formatElapsed(3_725_000)).toBe('1:02:05');
     expect(formatElapsed(-5000)).toBe('00:00');
+    expect(formatElapsed(((17 * 24) + 4) * 3_600_000)).toBe('17d 4h');
   });
 
   it('marks New/Preparing orders late after 20 minutes, never Ready/Served', () => {

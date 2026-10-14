@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { DOCUMENT, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { STATUS_LABELS, TYPE_LABELS } from '../../../core/models/order-labels';
 import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
+import { isLate } from './elapsed';
 import { BoardFilters, filterOrders } from './order-filters';
 import { OrderCardComponent } from './order-card.component';
 import { OrdersBoardStore } from './orders-board.store';
@@ -14,7 +16,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 @Component({
   selector: 'app-orders-board',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, OrderCardComponent],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, OrderCardComponent],
   providers: [OrdersBoardStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './orders-board.component.html',
@@ -37,7 +39,8 @@ export class OrdersBoardComponent {
     return { query: (params.get('q') ?? '').trim(), type: isOrderType(type) ? type : null };
   });
 
-  protected readonly hasFilters = computed(() => !!this.filters().query || !!this.filters().type);
+  /** Number of the order that was just created in the form, passed through router state. */
+  protected readonly createdOrder = signal<number | null>(this.consumeCreatedOrder());
 
   protected readonly search = new FormControl(this.filters().query, { nonNullable: true });
   /** Last query we wrote to the URL, so we can tell our own navigations from back/forward ones. */
@@ -52,6 +55,11 @@ export class OrdersBoardComponent {
         .filter((order) => order.status === status)
         .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)),
     }));
+  });
+
+  protected readonly lateCount = computed(() => {
+    const now = this.store.now();
+    return this.store.orders().filter((order) => isLate(order, now - Date.parse(order.createdAt))).length;
   });
 
   protected readonly visibleCount = computed(() =>
@@ -85,6 +93,17 @@ export class OrdersBoardComponent {
     this.search.setValue('', { emitEvent: false });
     this.lastPushedQuery = '';
     this.updateParams({ q: null, type: null });
+  }
+
+  /** Reads the one-time "order created" message and clears it so a page refresh doesn't show it again. */
+  private consumeCreatedOrder(): number | null {
+    const history = inject(DOCUMENT).defaultView?.history;
+    const created: unknown = history?.state?.createdOrder;
+    if (typeof created !== 'number') {
+      return null;
+    }
+    history?.replaceState({ ...history.state, createdOrder: undefined }, '');
+    return created;
   }
 
   private updateParams(params: { q?: string | null; type?: OrderType | null }): void {
