@@ -10,6 +10,15 @@
       </a>
       <button
         type="button"
+        class="btn btn--secondary btn--sm theme"
+        [attr.aria-label]="'nav.theme' | t"
+        [attr.aria-pressed]="theme.theme() === 'dark'"
+        (click)="theme.toggle()"
+      >
+        {{ theme.theme() === 'dark' ? '☀' : '☾' }}
+      </button>
+      <button
+        type="button"
         class="btn btn--secondary btn--sm lang"
         [attr.aria-label]="'nav.switchLanguage' | t"
         (click)="i18n.toggle()"
