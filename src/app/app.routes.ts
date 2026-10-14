@@ -12,6 +12,12 @@ export const routes: Routes = [
           import('./features/orders/board/orders-board.component').then((m) => m.OrdersBoardComponent),
       },
       {
+        path: 'new',
+        title: 'New order',
+        loadComponent: () =>
+          import('./features/orders/new/order-form.component').then((m) => m.OrderFormComponent),
+      },
+      {
         path: ':id',
         loadComponent: () =>
           import('./features/orders/details/order-details.component').then((m) => m.OrderDetailsComponent),
