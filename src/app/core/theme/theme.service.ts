@@ -7,7 +7,8 @@ const STORAGE_KEY = 'theme';
 
 /**
  * Light/dark theme. The choice is a signal mirrored into `<html data-theme>`, where the CSS
- * variables in styles.scss switch. First visit follows the OS preference.
+ * variables in styles.scss switch. Dark is the default: it is meant for kitchen displays, and a
+ * saved choice always wins.
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -38,8 +39,8 @@ export class ThemeService {
         return saved;
       }
     } catch {
-      // Fall through to the OS preference.
+      // Storage can be blocked; use the default.
     }
-    return this.document.defaultView?.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return 'dark';
   }
 }
