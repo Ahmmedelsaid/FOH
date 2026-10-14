@@ -13,7 +13,7 @@ import { TranslatePipe } from '../core/i18n/translate.pipe';
   standalone: true,
   imports: [TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<a class="back-link" href="/orders" (click)="back($event)">{{ 'common.back' | t }}</a>`,
+  template: `<a class="back-link" href="orders" (click)="back($event)">{{ 'common.back' | t }}</a>`,
 })
 export class BackLinkComponent {
   private readonly location = inject(Location);

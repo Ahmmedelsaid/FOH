@@ -54,6 +54,27 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "demo": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/app/core/api/api.providers.ts",
+                  "with": "src/app/core/api/api.providers.demo.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -66,6 +87,9 @@
             },
             "development": {
               "buildTarget": "kitchen-order-board:build:development"
+            },
+            "demo": {
+              "buildTarget": "kitchen-order-board:build:demo"
             }
           },
           "defaultConfiguration": "development"

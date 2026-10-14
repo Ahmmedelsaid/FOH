@@ -16,6 +16,17 @@ npm test         # unit tests (Karma + Jasmine, needs Chrome)
 `db.json` is created from `db.seed.json` the first time you run `npm run api`, and json-server writes your changes into it (it is git-ignored). `npm run api:reset` restores the seed data.
 The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts`).
 
+## Live demo
+
+**https://ahmmedelsaid.github.io/FOH/**: the same app on GitHub Pages. Static hosting has no json-server, so the demo build swaps `api.providers.ts` for `api.providers.demo.ts` (Angular `fileReplacements`), which answers `/menu` and `/orders` from memory with a small delay. The starting orders are timestamped a few minutes ago so the board looks alive. Changes last until the page is reloaded.
+
+```bash
+npm run start:demo   # run the demo build locally, no json-server needed
+npm run build:demo   # production build with base href /FOH/ and a 404.html fallback for deep links
+```
+
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) builds and publishes it on every push to `main`. One-time setup: repo Settings, Pages, Source: GitHub Actions.
+
 ## What is implemented
 
 | Requirement | Where |
@@ -27,9 +38,9 @@ The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts
 | New order `/orders/new` (lazy), FormArray, custom validators, running total, double-submit guard | `features/orders/new` |
 | Auto-refresh every 15s, no overlap, no flicker, stops on leave | `orders-board.store.ts` |
 | Loading / empty / error states, usable at 375px | every page |
-| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden, Arabic/English toggle with RTL, dark mode | `core/i18n`, `orders-board.store.ts` |
+| Bonus: deployed demo, unit tests, OnPush everywhere, polling paused while the tab is hidden, Arabic/English toggle with RTL, dark mode | `core/i18n`, `orders-board.store.ts` |
 
-Not done: deployed demo.
+Optional screen recording: not done.
 
 ## Decisions and why
 
