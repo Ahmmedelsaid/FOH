@@ -1,27 +1,66 @@
-# KitchenOrderBoard
+# Kitchen Orders Board
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Angular 17 app for restaurant staff to track orders from "New" to "Served". Built for the Front of House take-home task.
 
-## Development server
+## Setup
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Requires Node 18.19+ (developed on Node 20).
 
-## Code scaffolding
+```bash
+npm install
+npm run api      # mock API (json-server) on http://localhost:3000
+npm start        # app on http://localhost:4200  (in a second terminal)
+npm test         # unit tests (Karma + Jasmine, needs Chrome)
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+json-server writes changes into `db.json`. `npm run api:reset` restores it from `db.seed.json`.
+The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts`).
 
-## Build
+## What is implemented
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+| Requirement | Where |
+|---|---|
+| Board `/orders`, 4 columns with counts, cards, live elapsed time, late marker | `features/orders/board` |
+| Search (debounced) + type filter stored in URL query params (`?q=&type=`) | `orders-board.component.ts` |
+| Move forward with optimistic update and rollback + error banner | `orders-board.store.ts` |
+| Details `/orders/:id` (lazy), price breakdown, 404 handling | `features/orders/details` |
+| New order `/orders/new` (lazy), FormArray, custom validators, running total, double-submit guard | `features/orders/new` |
+| Auto-refresh every 15s, no overlap, no flicker, stops on leave | `orders-board.store.ts` |
+| Loading / empty / error states, usable at 375px | every page |
+| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden | |
 
-## Running unit tests
+Not done: Arabic/English + RTL, deployed demo.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Decisions and why
 
-## Running end-to-end tests
+- **Signals for state, RxJS for async.** Component and store state are signals (simple reads in templates, works well with OnPush and `computed`). Anything time-based or request-based (polling, debounce, `exhaustMap`, `switchMap`) stays in RxJS, which is better at it. They meet at `toSignal` / `takeUntilDestroyed`.
+- **Board store is provided by the board component, not root.** Its polling and clock subscriptions are bound to the component's `DestroyRef`, so leaving the page stops everything. No manual unsubscribing.
+- **Polling:** `merge(timer, retry)` into `exhaustMap`. Ticks that arrive while a request is in flight are ignored, so requests never overlap. Updating a signal with new data re-renders only changed cards (`@for ... track order.id`), so there is no flicker and no loading state after the first load. If a refresh fails, the old data stays and a warning banner appears.
+- **Stale poll vs optimistic update.** A poll that was in flight when the user moved an order could return the old status and flip the card back. The store keeps a `mutationEpoch` counter and discards a poll response if a status change started or finished while it was running. The next poll (15s) corrects the view.
+- **Rollback** restores only the one order's previous status, so other changes made meanwhile are not overwritten.
+- **URL is the source of truth for filters.** The component reads `queryParamMap` as a signal; the search input only writes to the URL after the debounce. `lastPushedQuery` lets it tell its own navigations from back/forward ones.
+- **One shared clock.** The store ticks a `now` signal every second and passes it to the cards as an input, instead of one interval per card.
+- **Form:** conditional validation (table for dine-in, phone for delivery) is applied by swapping validators when the type changes, and the irrelevant field is cleared. Custom validators: `egyptianMobile` and `minArrayLength` (`order-form.validators.ts`).
+- **Money** is rounded to 2 decimals at each step (service, then VAT), which reproduces the reference numbers (574.56 and 273.60).
+- **Kitchen-first UI.** Cards preview the items and notes so staff do not need to open each order, the action button is coloured by the status the order moves to, and a header shows when the board last refreshed plus how many orders are late. The new-order form keeps a live summary (lines, service, VAT, total) next to the form on desktop.
+- No UI library: plain SCSS with a few CSS variables kept the bundle small and the code easy to explain.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Assumptions
 
-## Further help
+- Card total shows the **grand total** (service + VAT included). The task sketch shows subtotals, so this is a deliberate difference.
+- Item count on a card is the sum of quantities (#1041 shows "4 items", matching the sketch).
+- Search matches order number or table number by substring; a leading `#` is ignored.
+- Seed orders are old, so New/Preparing ones show as late (expected per the task).
+- The "late" marker is shown with text as well as colour. Served orders show "done" instead of a timer.
+- The same menu item can appear in more than one row of a new order.
+- New order number = highest existing number + 1, and `id` is the number as a string. With a real backend the server would assign both; two clients creating orders at the same moment could collide here.
+- The menu is fetched once and cached (`shareReplay`); a failed request is not cached.
+- Mobile layout: columns scroll horizontally with snap, one column at a time.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## What I would improve with more time
+
+- Arabic/English toggle with RTL (logical CSS properties are already used in a few places).
+- Tests for the store (polling overlap, rollback) with fake timers and `HttpTestingController`, and for the form component.
+- Show the advance action on the details page too; toast instead of a banner for errors.
+- Deployed demo with a mocked API.
+- Move elapsed-time formatting to a pipe and extract the repeated loading/error state markup into a small component.
