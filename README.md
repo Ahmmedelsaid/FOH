@@ -27,9 +27,9 @@ The API URL is the `API_URL` injection token (`src/app/core/api/api-url.token.ts
 | New order `/orders/new` (lazy), FormArray, custom validators, running total, double-submit guard | `features/orders/new` |
 | Auto-refresh every 15s, no overlap, no flicker, stops on leave | `orders-board.store.ts` |
 | Loading / empty / error states, usable at 375px | every page |
-| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden | |
+| Bonus: unit tests, OnPush everywhere, polling paused while the tab is hidden, Arabic/English toggle with RTL | `core/i18n`, `orders-board.store.ts` |
 
-Not done: Arabic/English + RTL, deployed demo.
+Not done: deployed demo.
 
 ## Decisions and why
 
@@ -43,6 +43,7 @@ Not done: Arabic/English + RTL, deployed demo.
 - **Form:** conditional validation (table for dine-in, phone for delivery) is applied by swapping validators when the type changes, and the irrelevant field is cleared. Custom validators: `egyptianMobile` and `minArrayLength` (`order-form.validators.ts`).
 - **Money** is rounded to 2 decimals at each step (service, then VAT), which reproduces the reference numbers (574.56 and 273.60).
 - **Kitchen-first UI.** Cards preview the items and notes so staff do not need to open each order, the action button is coloured by the status the order moves to, and a header shows when the board last refreshed plus how many orders are late. The new-order form keeps a live summary (lines, service, VAT, total) next to the form on desktop.
+- **Arabic/English with RTL.** A small runtime i18n service (`core/i18n`): the language is a signal, templates use an impure `t` pipe, plurals go through `Intl.PluralRules` (Arabic has six forms) and the Arabic dictionary is a typed `Record`, so a missing key fails the build. The service sets `lang` and `dir` on `<html>`, and the CSS uses logical properties (`inline-start`, `padding-inline`), so one stylesheet serves both directions. Angular's built-in i18n needs one build per language, which does not fit a toggle button.
 - No UI library: plain SCSS with a few CSS variables kept the bundle small and the code easy to explain.
 
 ## Assumptions
@@ -56,10 +57,12 @@ Not done: Arabic/English + RTL, deployed demo.
 - New order number = highest existing number + 1, and `id` is the number as a string. With a real backend the server would assign both; two clients creating orders at the same moment could collide here.
 - The menu is fetched once and cached (`shareReplay`); a failed request is not cached.
 - Mobile layout: columns scroll horizontally with snap, one column at a time.
+- Digits stay Latin (0-9) in Arabic so order numbers and prices look the same in both languages.
+- The API returns English menu names only, so the seed menu ids (m1-m7) are translated in the dictionary and any new item falls back to its API name. A real backend would return localized names.
+- Notes typed by staff are shown as written (not translated).
 
 ## What I would improve with more time
 
-- Arabic/English toggle with RTL (logical CSS properties are already used in a few places).
 - Tests for the store (polling overlap, rollback) with fake timers and `HttpTestingController`, and for the form component.
 - Show the advance action on the details page too; toast instead of a banner for errors.
 - Deployed demo with a mocked API.
