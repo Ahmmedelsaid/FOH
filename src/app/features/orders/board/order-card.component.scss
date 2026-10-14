@@ -32,11 +32,10 @@
     --status-color: var(--ready);
   }
 
-  // Late orders are tinted so they stand out from the other cards at a glance.
+  // Late is a signal, not a flood of red: a red edge, red timer and a LATE pill are enough.
   &.late {
     border-color: var(--late-border);
     border-inline-start-color: var(--late);
-    background: color-mix(in srgb, var(--late) 9%, var(--surface));
   }
 
   &[data-status='served'] {
@@ -54,9 +53,9 @@ header {
 
 .number {
   font-family: var(--mono);
-  font-size: 1.625rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1.1;
   color: inherit;
   text-decoration: none;
@@ -99,8 +98,8 @@ header {
   .qty {
     min-width: 2rem;
     font-family: var(--mono);
-    font-weight: 800;
-    color: var(--text);
+    font-weight: 700;
+    color: var(--muted);
   }
 
   .name {
@@ -147,12 +146,10 @@ header {
   text-decoration: underline;
 }
 
+// Same layout on every card: timer on top, full-width action underneath.
 footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
+  display: grid;
+  gap: 0.6rem;
 }
 
 // The timer is the most important number for the kitchen, so it is the biggest thing in the footer.
@@ -162,7 +159,7 @@ footer {
   gap: 0.5rem;
   font-family: var(--mono);
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
   color: var(--muted);
 
@@ -188,6 +185,7 @@ footer {
   // Above the stretched card link, so the button works while the rest of the card opens the order.
   position: relative;
   z-index: 1;
+  width: 100%;
   min-height: 44px;
   padding: 0 1rem;
   border-radius: 10px;
