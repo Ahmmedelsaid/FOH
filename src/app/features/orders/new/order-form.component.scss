@@ -326,3 +326,86 @@
     border-radius: 8px 0 0 8px;
   }
 }
+
+// The sticky total + submit bar only exists on phones.
+.mobile-bar {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  :host {
+    display: block;
+    // Room for the sticky bar so it never covers the last fields.
+    padding-bottom: 5rem;
+  }
+
+  .mobile-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1rem max(0.7rem, env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border-strong);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 12%);
+  }
+
+  .mobile-total {
+    display: grid;
+    line-height: 1.2;
+
+    span {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    strong {
+      font-family: var(--mono);
+      font-size: 1.125rem;
+    }
+  }
+
+  // The sticky bar replaces the summary's own button.
+  .summary .submit {
+    display: none;
+  }
+
+  // Item row: the select gets the full width, quantity and remove share the next line.
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'item item'
+      'qty remove'
+      'note note';
+
+    .qty {
+      max-width: 190px;
+    }
+  }
+
+  // Two quick-add buttons per line instead of one long pill each.
+  .chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chip {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: start;
+    gap: 0.1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    position: relative;
+
+    .chip-qty {
+      position: absolute;
+      inset-block-start: 0.4rem;
+      inset-inline-end: 0.5rem;
+    }
+  }
+}

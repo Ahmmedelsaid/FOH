@@ -70,7 +70,7 @@ Optional screen recording: not done.
 - Quick add merges taps on the same item into one row (quantity goes up). Rows added by hand with "Add item" can still repeat an item.
 - New order number = highest existing number + 1, and `id` is the number as a string. With a real backend the server would assign both; two clients creating orders at the same moment could collide here.
 - The menu is fetched once and cached (`shareReplay`); a failed request is not cached.
-- Mobile layout: columns scroll horizontally with snap, one column at a time.
+- Mobile layout: below 900px the board shows one status at a time, picked with tabs that carry the counts (sideways scrolling hid the other columns and their counts). The new-order form keeps the total and the submit button in a sticky bar at the bottom. Desktop keeps the four columns.
 - Digits stay Latin (0-9) in Arabic so order numbers and prices look the same in both languages.
 - The API returns English menu names only, so the seed menu ids (m1-m7) are translated in the dictionary and any new item falls back to its API name. A real backend would return localized names.
 - Notes typed by staff are shown as written (not translated).
