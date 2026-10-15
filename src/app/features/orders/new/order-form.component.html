@@ -221,6 +221,17 @@
           {{ (submitting() ? 'form.creating' : 'form.submit') | t }}
         </button>
       </aside>
+
+      <!-- Phones: the total and the submit button stay visible at the bottom while scrolling. -->
+      <div class="mobile-bar">
+        <div class="mobile-total">
+          <span>{{ 'price.total' | t }}</span>
+          <strong>{{ i18n.money(price().total) }}</strong>
+        </div>
+        <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+          {{ (submitting() ? 'form.creating' : 'form.submit') | t }}
+        </button>
+      </div>
     </form>
   }
 }

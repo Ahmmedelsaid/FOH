@@ -117,10 +117,27 @@
         </button>
       </div>
     } @else {
+      <!-- Phones show one status at a time; these tabs replace the sideways scrolling. -->
+      <div class="status-tabs" role="group" [attr.aria-label]="'board.statusLabel' | t">
+        @for (column of visibleColumns(); track column.status) {
+          <button
+            type="button"
+            class="status-tab"
+            [attr.data-status]="column.status"
+            [attr.aria-pressed]="currentStatus() === column.status"
+            (click)="selectStatus(column.status)"
+          >
+            <span>{{ 'status.' + column.status | t }}</span>
+            <span class="count ltr">{{ column.orders.length }}</span>
+          </button>
+        }
+      </div>
+
       <div class="columns" [class.is-search]="hasSearch()">
         @for (column of visibleColumns(); track column.status) {
           <section
             class="column"
+            [class.is-active]="column.status === currentStatus()"
             [attr.data-status]="column.status"
             [attr.aria-label]="'status.' + column.status | t"
           >
