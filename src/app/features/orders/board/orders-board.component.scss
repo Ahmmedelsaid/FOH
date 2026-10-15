@@ -155,21 +155,113 @@
   font-size: 0.875rem;
 }
 
-// On phones the four columns scroll horizontally and snap, one column at a time.
+// Status tabs only exist on phones.
+.status-tabs {
+  display: none;
+}
+
+// On phones one status is shown at a time, chosen with the tabs, instead of sideways scrolling.
 @media (max-width: 899px) {
-  .columns {
+  .page-head {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .head-actions {
+    flex-shrink: 0;
+  }
+
+  .toolbar {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .status-tabs {
+    position: sticky;
+    top: 57px;
+    z-index: 5;
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.5rem;
-    margin-inline: -1rem;
-    padding-inline: 1rem;
-    scroll-padding-inline: 1rem;
+    gap: 0.4rem;
+    margin: 0 -1rem 0.75rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-tab {
+    --tab-color: var(--served);
+    // Count above the name, so all four tabs fit side by side on a phone without scrolling.
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-height: 52px;
+    padding: 0.3rem 0.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[data-status='new'] {
+      --tab-color: var(--new);
+    }
+    &[data-status='preparing'] {
+      --tab-color: var(--preparing);
+    }
+    &[data-status='ready'] {
+      --tab-color: var(--ready);
+    }
+
+    .count {
+      min-width: 1.6rem;
+      padding: 0 0.4rem;
+      border-radius: 999px;
+      background: var(--chip);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    &[aria-pressed='true'] {
+      border-color: var(--tab-color);
+      background: color-mix(in srgb, var(--tab-color) 14%, var(--surface));
+      color: var(--text);
+
+      .count {
+        background: var(--tab-color);
+        color: var(--on-column);
+      }
+    }
+  }
+
+  .columns {
+    display: block;
   }
 
   .column {
-    flex: 0 0 86%;
-    scroll-snap-align: start;
+    display: none;
+    min-height: 0;
+    padding: 0;
+    background: none;
+    border-top: 0;
+
+    &.is-active {
+      display: grid;
+    }
+
+    // The tab already shows the status name and count.
+    h2 {
+      display: none;
+    }
   }
 
   .search {

@@ -6,7 +6,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
-import { ORDER_STATUSES, ORDER_TYPES, OrderType, isOrderType } from '../../../core/models/order.model';
+import {
+  ORDER_STATUSES,
+  ORDER_TYPES,
+  OrderStatus,
+  OrderType,
+  isOrderType,
+} from '../../../core/models/order.model';
 import { isLate } from './elapsed';
 import { BoardFilters, filterOrders, parseQuery } from './order-filters';
 import { OrderCardComponent } from './order-card.component';
@@ -69,6 +75,17 @@ export class OrdersBoardComponent {
     this.hasSearch() ? this.columns().filter((column) => column.orders.length > 0) : this.columns(),
   );
 
+  /** The tab picked on small screens, where one status is shown at a time. */
+  private readonly activeStatus = signal<OrderStatus>('new');
+
+  /** The status shown on small screens: the picked tab, or the first one left if a search hid it. */
+  protected readonly currentStatus = computed<OrderStatus>(() => {
+    const columns = this.visibleColumns();
+    return columns.some((column) => column.status === this.activeStatus())
+      ? this.activeStatus()
+      : (columns[0]?.status ?? 'new');
+  });
+
   protected readonly lateCount = computed(() => {
     const now = this.store.now();
     return this.store.orders().filter((order) => isLate(order, now - Date.parse(order.createdAt))).length;
@@ -101,6 +118,10 @@ export class OrdersBoardComponent {
         this.searchText.set(query);
       }
     });
+  }
+
+  protected selectStatus(status: OrderStatus): void {
+    this.activeStatus.set(status);
   }
 
   protected setType(type: OrderType | null): void {
